@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Stronk-Diffusion</title>
+    <script>
+      const documentHeight = () => {
+      const doc = document.documentElement
+      doc.style.setProperty('--doc-height', `${window.innerHeight}px`)
+      }
+      window.addEventListener("resize", documentHeight)
+      documentHeight()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

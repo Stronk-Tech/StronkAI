@@ -1,0 +1,6 @@
+node_modules
+client/.eslintcache
+*.txt
+client/src/components/Home/index.js
+package-lock.json
+.env

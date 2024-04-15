@@ -1,0 +1,25 @@
+{
+  "name": "nodebootstraper",
+  "version": "5.0.0",
+  "dependencies": {
+    "@material-ui/icons": "^4.11.3",
+    "body-parser": "*",
+    "cors": "^2.8.5",
+    "express": "*",
+    "image-size": "^1.1.1",
+    "method-override": "*",
+    "morgan": "*",
+    "pug": "*",
+    "request": "^2.88.2",
+    "stylus": "*",
+    "ws": "^8.16.0"
+  },
+  "engines": {
+    "node": "*",
+    "npm": "*"
+  },
+  "scripts": {
+    "start": "node --env-file=.env app.js",
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
+  }
+}

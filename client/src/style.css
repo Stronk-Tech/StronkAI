@@ -1,0 +1,111 @@
+/* Screen agnostic properties */
+html {
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
+  height: 100vh; /* fallback for Js load */
+  height: var(--doc-height);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  background: #0F2027;
+  background: -webkit-radial-gradient(circle at center, rgb(53, 58, 60), rgba(39, 42, 44), rgba(40, 43, 44));
+  background: radial-gradient(circle at center, rgba(53, 58, 60), rgba(39, 42, 44), rgba(40, 43, 44.92));
+  user-select: none;
+  color: rgb(232, 230, 227);
+}
+
+input {
+  background-color: rgba(24, 26, 27, 0.77);
+  color: rgb(232, 230, 227);
+  border-bottom-style: double;
+  border-bottom-color: rgba(56, 109, 164, 0.82);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  height: 24px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+textarea {
+  background-color: rgba(24, 26, 27, 0.77);
+  color: rgb(232, 230, 227);
+  border-bottom-style: double;
+  border-bottom-color: rgba(56, 109, 164, 0.82);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  height: 24px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  resize: none;
+}
+
+p { 
+  font-size: 14px;
+  color: rgb(232, 230, 227);
+}
+
+div { 
+  font-size: 14px;
+  color: rgb(232, 230, 227);
+}
+
+a { 
+  color: rgb(119, 168, 208);
+}
+
+input:focus{
+  outline:0;
+}
+textarea:focus{
+  outline:0;
+}
+
+/* Filter elements on screen size */
+.show-small-screen {
+  display: flex;
+}
+.show-big-screen {
+  display: none;
+}
+.hide-small-screen {
+  display: none;
+}
+.hide-big-screen {
+  display: flex;
+}
+
+/* For when there is more screen real estate */
+@media (min-width: 1024px){
+  input {
+    font-size: 18px;
+    height: 36px;
+  }
+  textarea {
+    font-size: 18px;
+    height: 36px;
+  }
+  p { 
+    font-size: 18px;
+  }
+  div { 
+    font-size: 18px;
+  }
+
+  .show-small-screen {
+    display: flex;
+  }
+  .show-big-screen {
+    display: flex;
+  }
+  .hide-small-screen {
+    display: none;
+  }
+  .hide-big-screen {
+    display: none;
+  }
+}

@@ -1,0 +1,142 @@
+.container {  
+    padding: 0;
+    margin: 0;
+    display: flex;
+    width: 100vw;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .top { 
+    display: flex;
+    flex-direction: column;
+    background: rgba(24, 26, 27, 0.8);
+   }
+
+  .bot { 
+    display: flex;
+    flex-direction: row; 
+    height: 100%;
+  }
+  
+  .left { 
+    display: flex;
+    flex-direction: column;
+    grid-area: left; 
+    overflow: hidden;
+    flex: 1;
+    background: rgba(56, 60, 62, 0.7);
+  }
+  
+  .max-and-center { 
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .right { 
+    display: flex;
+    flex-direction: column;
+    grid-area: right;
+    overflow: hidden;
+    flex: 1;
+    background: rgba(56, 60, 62, 0.7);
+  }
+
+.style-button:hover {
+    background-color: rgba(67, 73, 76, 0.57);
+}
+
+.style-button {
+   background-color: rgba(24, 26, 27, 0.77);
+    display: flex;
+    border-radius: 1em;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    justify-content: center;
+}
+
+.grid {
+  display: flex;
+}
+
+.grid-grid {
+  display: grid;
+  z-index: 1;
+  border-radius: 1em;
+  padding: 0.2em;
+  background-color: rgb(27, 30, 31);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  align-self: center;
+  grid-gap: 2px;
+  grid-template-columns: repeat(2, 80px);
+  grid-template-rows: 30px 30px 30px 30px 30px 30px;
+}
+
+.grid-button {
+  background-color: rgba(67, 73, 76, 0.57);
+  border-radius: 1em;
+  padding: 0.2em;
+  overflow: none;
+  flex-wrap: none;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  align-content: center;
+}
+
+.grid-button:hover  {
+  background-color: rgba(187, 187, 187, 0.568);
+}
+
+/* For when there is more screen real estate */
+@media (min-width: 640px){
+  .grid-grid {
+    padding: 0.4em;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: 50px 50px 50px 50px;
+  }
+  .grid-button {
+    padding: 0.4em;
+  }
+}
+@media (min-width: 1024px){
+  .left { 
+    display: flex;
+    flex-direction: column;
+    grid-area: left; 
+    overflow: hidden;
+    min-width: 0;
+    min-width: 500px;
+    max-width: 500px;
+    background: rgba(56, 60, 62, 0.7);
+  }
+  .right { 
+    display: flex;
+    flex-direction: column;
+    grid-area: right;
+    overflow: hidden;
+    min-width: 0;
+    min-width: 300px;
+    max-width: 300px;
+    background: rgba(56, 60, 62, 0.7);
+  }
+
+  .grid-grid {
+    padding: 0.6em;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: 50px 50px 50px 50px;
+  }
+  .grid-button {
+    padding: 0.6em;
+  }
+}
