@@ -776,169 +776,181 @@ export default function Home() {
             </div>
           </div>
           {/* Animation selection */}
-          <p style={{ color: "#ffffff", alignSelf: "center" }}>Animate</p>
-          <div
-            style={{
-              display: "flex",
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+          {thisModelInfo?.supportsAnimateLCM ||
+          thisModelInfo?.supportsAnimateDiff ||
+          thisModelInfo?.supportsAnimateDiffLightning ? (
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>Animate</p>
+          ) : null}
+          {thisModelInfo?.supportsAnimateLCM ||
+          thisModelInfo?.supportsAnimateDiff ||
+          thisModelInfo?.supportsAnimateDiffLightning ? (
             <div
-              className={
-                !model.enableAnimateLCM &&
-                !model.enableAnimateDiff &&
-                !model.enableAnimateDiffLightning
-                  ? "style-button border"
-                  : "style-button"
-              }
               style={{
-                padding: 0,
-                alignContent: "center",
+                display: "flex",
+                width: "100%",
                 justifyContent: "center",
                 alignItems: "center",
-                flex: "1",
-                height: "40px",
-              }}
-              onClick={() => {
-                model.enableAnimateLCM = false;
-                model.enableAnimateDiff = false;
-                model.enableAnimateDiffLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
+                flexDirection: "row",
               }}
             >
-              None
-            </div>
-            <div
-              className={
-                model.enableAnimateDiff ? "style-button border" : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsAnimateDiff
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (!thisModelInfo.supportsAnimateDiff) {
-                  return;
+              <div
+                className={
+                  !model.enableAnimateLCM &&
+                  !model.enableAnimateDiff &&
+                  !model.enableAnimateDiffLightning
+                    ? "style-button border"
+                    : "style-button"
                 }
-                model.enableAnimateLCM = false;
-                model.enableAnimateDiff = true;
-                model.enableAnimateDiffLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              Slow
-            </div>
-            <div
-              className={
-                model.enableAnimateDiffLightning
-                  ? "style-button border"
-                  : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsAnimateDiffLightning
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (!thisModelInfo.supportsAnimateDiffLightning) {
-                  return;
+                style={{
+                  padding: 0,
+                  alignContent: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: "1",
+                  height: "40px",
+                }}
+                onClick={() => {
+                  model.enableAnimateLCM = false;
+                  model.enableAnimateDiff = false;
+                  model.enableAnimateDiffLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                None
+              </div>
+              <div
+                className={
+                  model.enableAnimateDiff
+                    ? "style-button border"
+                    : "style-button"
                 }
-                model.enableAnimateLCM = false;
-                model.enableAnimateDiff = false;
-                model.enableAnimateDiffLightning = true;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              Faster
-            </div>
-            <div
-              className={
-                model.enableAnimateLCM ? "style-button border" : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsAnimateLCM
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (!thisModelInfo.supportsAnimateLCM) {
-                  return;
+                style={
+                  !thisModelInfo.supportsAnimateDiff
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
                 }
-                model.enableAnimateLCM = true;
-                model.enableAnimateDiff = false;
-                model.enableAnimateDiffLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              Fastest
+                onClick={() => {
+                  if (!thisModelInfo.supportsAnimateDiff) {
+                    return;
+                  }
+                  model.enableAnimateLCM = false;
+                  model.enableAnimateDiff = true;
+                  model.enableAnimateDiffLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                Slow
+              </div>
+              <div
+                className={
+                  model.enableAnimateDiffLightning
+                    ? "style-button border"
+                    : "style-button"
+                }
+                style={
+                  !thisModelInfo.supportsAnimateDiffLightning
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
+                }
+                onClick={() => {
+                  if (!thisModelInfo.supportsAnimateDiffLightning) {
+                    return;
+                  }
+                  model.enableAnimateLCM = false;
+                  model.enableAnimateDiff = false;
+                  model.enableAnimateDiffLightning = true;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                Faster
+              </div>
+              <div
+                className={
+                  model.enableAnimateLCM
+                    ? "style-button border"
+                    : "style-button"
+                }
+                style={
+                  !thisModelInfo.supportsAnimateLCM
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
+                }
+                onClick={() => {
+                  if (!thisModelInfo.supportsAnimateLCM) {
+                    return;
+                  }
+                  model.enableAnimateLCM = true;
+                  model.enableAnimateDiff = false;
+                  model.enableAnimateDiffLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                Fastest
+              </div>
             </div>
-          </div>
+          ) : null}
           {/* Prompt input */}
           <div
             style={{
