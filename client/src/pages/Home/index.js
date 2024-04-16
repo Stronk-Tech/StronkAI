@@ -661,7 +661,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Turbo
+              Fast
             </div>
             <div
               className={
@@ -702,7 +702,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Lightning
+              Faster
             </div>
             <div
               className={
@@ -743,7 +743,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              LCM
+              Fastest
             </div>
           </div>
           {/* Animation selection */}
@@ -866,7 +866,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Lightning
+              Faster
             </div>
             <div
               className={
@@ -907,7 +907,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              LCM
+              Fastest
             </div>
           </div>
           {/* Prompt input */}
