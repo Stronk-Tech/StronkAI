@@ -106,9 +106,17 @@ const onResult = (resData, pipeline) => {
     for (const image of resData.images) {
       let filename = image.url.substring(image.url.lastIndexOf("/") + 1);
       let filepath;
-      if (pipeline == "" || pipeline == "text-to-image" || pipeline == "image-to-image") {
+      if (
+        pipeline == "" ||
+        pipeline == "text-to-image" ||
+        pipeline == "image-to-image"
+      ) {
         filepath = imagePath + "/" + filename;
-      } else if (pipeline == "image-to-video" || pipeline == "text-to-video") {
+      } else if (
+        pipeline == "image-to-video" ||
+        pipeline == "text-to-video" ||
+        pipeline == "video-to-video"
+      ) {
         filepath = videoPath + "/" + filename;
       }
       console.log(filename, filepath, image.url);
@@ -140,7 +148,8 @@ const onResult = (resData, pipeline) => {
                 wsServer.broadcast(JSON.stringify({ newImage: filename }));
               } else if (
                 pipeline == "image-to-video" ||
-                pipeline == "text-to-video"
+                pipeline == "text-to-video" ||
+                pipeline == "video-to-video"
               ) {
                 videoFilesSorted.push(filename);
                 wsServer.broadcast(JSON.stringify({ newVideo: filename }));
@@ -238,17 +247,11 @@ const mint = (workerIdx, job) => {
   if (workers[workerIdx].busy) {
     return;
   }
-  let width = 1024;
-  let height = 576;
-  if (job.quality == "SD") {
-    width = 1024;
-    height = 576;
-  } else if (job.quality == "HD") {
-    width = 1024;
-    height = 1024;
-  }
   workers[workerIdx].busy = true;
   workers[workerIdx].pipeline = job.pipeline;
+  if (job.pipeline == "text-to-image" && job.animate_module != "") {
+    job.pipeline = "text-to-video";
+  }
   workers[workerIdx].model_id = job.model_id;
   workers[workerIdx].timestamp = Date.now();
   wsServer.broadcast(
@@ -261,21 +264,28 @@ const mint = (workerIdx, job) => {
   let data;
   let options;
   if (job.source) {
+    const formData = {
+      prompt: job.prompt,
+      model_id: job.model_id,
+      base_model_id: job.base_model_id,
+      negative_prompt: job.negative_prompt,
+      width: job.width,
+      height: job.height,
+      motion: job.motion,
+      speedup_module: job.speedup_module,
+      animate_module: job.animate_module,
+    };
+    if (pipeline == "video-to-video") {
+      formData.video = fs.createReadStream(job.source);
+    } else {
+      formData.image = fs.createReadStream(job.source);
+    }
     const options = {
       method: "POST",
       url:
         "http://" + broadcasterUri + ":" + broadcasterPort + "/" + job.pipeline,
       strictSSL: false,
-      formData: {
-        image: fs.createReadStream(job.source),
-        prompt: job.prompt,
-        model_id: job.model_id,
-        negative_prompt: job.negative_prompt,
-        motion: job.motion,
-        width: width,
-        height: height,
-        fps: job.quality == "HD" ? 9 : 6,
-      },
+      formData: formData,
     };
     request(options, function (err, res, body) {
       workers[workerIdx].busy = false;
@@ -297,10 +307,13 @@ const mint = (workerIdx, job) => {
     data = JSON.stringify({
       prompt: job.prompt,
       model_id: job.model_id,
+      base_model_id: job.base_model_id,
       negative_prompt: job.negative_prompt,
+      width: job.width,
+      height: job.height,
       motion: job.motion,
-      width: width,
-      height: height,
+      speedup_module: job.speedup_module,
+      animate_module: job.animate_module,
     });
     options = {
       hostname: broadcasterUri,
@@ -362,10 +375,12 @@ app.post("/tokenize", (req, res) => {
   const prompt = req.body.prompt || "";
   const negative_prompt = req.body.negative_prompt || "";
   const motion = req.body.motion || "";
-  const model_id = req.body.model_id;
   const image = req.body.image;
-  const pipeline = req.body.pipeline;
-  const quality = req.body.quality || "SD";
+  let model_id = req.body.model;
+  let base_model_id = req.body.baseModel || "";
+  let pipeline = req.body.pipeline;
+  let speedup_module = req.body.speedup_module || "";
+  let animate_module = req.body.animate_module || "";
 
   if (!model_id || !pipeline || model_id == "" || pipeline == "") {
     res.sendStatus(400);
@@ -375,6 +390,77 @@ app.post("/tokenize", (req, res) => {
   if (queue.length >= maxQueueSize) {
     res.sendStatus(400);
     return;
+  }
+
+  let width = 512;
+  let height = 512;
+  if (pipeline == "image-to-video"){
+    if (model_id == "ali-vilab/i2vgen-xl"){
+      width = 768;
+      height = 768;
+    }else if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"){
+      width = 1024;
+      height = 576;
+    }
+  } else if (pipeline == "text-to-image"){
+    if (model_id == "stabilityai/stable-diffusion-xl-base-1.0"){
+      width = 1024;
+      height = 1024;
+    }else if (model_id == "runwayml/stable-diffusion-v1-5"){
+      width = 768;
+      height = 768;
+    }
+  }
+
+  // For certain SDXL-based modules, request the dedicated models.
+  // For other Turbo/Lightning modes, load in the LoRas
+  if (model_id == "stabilityai/stable-diffusion-xl-base-1.0") {
+    if (speedup_module == "Turbo") {
+      speedup_module = "";
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
+        base_model_id = ""
+        model_id = "Lykon/dreamshaper-xl-v2-turbo"
+      }else{
+        base_model_id = ""
+        model_id = "stabilityai/sdxl-turbo"
+      }
+    }else if (speedup_module == "Lightning") {
+      speedup_module = "";
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
+        base_model_id = ""
+        model_id = "Lykon/dreamshaper-xl-lightning"
+      }else{
+        base_model_id = ""
+        model_id = "ByteDance/SDXL-Lightning"
+      }
+    }else{
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
+        base_model_id = ""
+        model_id = "Lykon/dreamshaper-xl-1-0"
+      }
+    }
+  }else if (animate_module != "") {
+    if (base_model_id == ""){
+      base_model_id == "runwayml/stable-diffusion-v1-5"
+    }
+    if (animate_module == "LCM"){
+      model_id = "wangfuyun/AnimateLCM"
+    }else if (animate_module == "AnimateDiff"){
+      model_id = "ByteDance/AnimateDiff"
+    }else if (animate_module == "AnimateDiffLightning"){
+      model_id = "ByteDance/AnimateDiff-Lightning"
+    }
+  } else if (base_model_id != ""){
+    // Since we don't support hot-swapping base models at the moment
+    // request it as a dedicated model in the pipeline, which is supported.
+    // model_id = base_model_id;
+    // base_model_id = "";
+  }
+  if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"){
+    if (speedup_module == "LCM") {
+      model_id = "wangfuyun/AnimateLCM-SVD-xt";
+      base_model_id = "";
+    }
   }
 
   if (pipeline == "image-to-image" || pipeline == "image-to-video") {
@@ -388,9 +474,42 @@ app.post("/tokenize", (req, res) => {
       negative_prompt: negative_prompt,
       motion: motion,
       model_id: model_id,
+      base_model_id: base_model_id,
       source: imagePath + "/" + image,
-      quality: quality,
       pipeline: pipeline,
+      speedup_module: speedup_module,
+      animate_module: animate_module,
+      width: width,
+      height: height,
+      timestamp: Date.now(),
+    });
+    wsServer.broadcast(
+      JSON.stringify({
+        queue: queue,
+        workers: workers,
+        maxQueueSize: maxQueueSize,
+      })
+    );
+    res.sendStatus(200);
+    queueJob();
+  } else if (pipeline == "video-to-video") {
+    if (!image || image == "") {
+      console.log("vid2X requires video");
+      res.sendStatus(400);
+      return;
+    }
+    queue.unshift({
+      prompt: prompt,
+      negative_prompt: negative_prompt,
+      motion: motion,
+      model_id: model_id,
+      base_model_id: base_model_id,
+      source: videoPath + "/" + image,
+      pipeline: pipeline,
+      speedup_module: speedup_module,
+      animate_module: animate_module,
+      width: width,
+      height: height,
       timestamp: Date.now(),
     });
     wsServer.broadcast(
@@ -408,9 +527,13 @@ app.post("/tokenize", (req, res) => {
       negative_prompt: negative_prompt,
       motion: motion,
       model_id: model_id,
+      base_model_id: base_model_id,
       source: null,
-      quality: quality,
       pipeline: pipeline,
+      speedup_module: speedup_module,
+      animate_module: animate_module,
+      width: width,
+      height: height,
       timestamp: Date.now(),
     });
     wsServer.broadcast(

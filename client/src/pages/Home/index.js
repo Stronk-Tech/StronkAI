@@ -1,7 +1,7 @@
 /*
   Contains state, mutators and layout of the app
 */
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import "./style.css";
 import HeaderForm from "../../components/Header";
 import SideBar from "../../components/SideBar";
@@ -16,6 +16,143 @@ const WS_URL = process.env.REACT_APP_WS_URL || "ws://127.0.0.1:42069";
 
 // Random prompt button which does not exist yet
 const examplePrompts = [""];
+
+// All
+const models = [
+  {
+    name: "SDXL",
+    model: "stabilityai/stable-diffusion-xl-base-1.0",
+    baseModels: [
+      {
+        name: "None",
+        model: "",
+      },
+      {
+        name: "DreamShaper",
+        model: "Lykon/dreamshaper-xl-1-0",
+      },
+    ],
+    pipeline: "text-to-image",
+    supportsLCM: true,
+    supportsTurbo: true,
+    supportsLightning: true,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+  {
+    name: "SD1.5",
+    model: "runwayml/stable-diffusion-v1-5",
+    baseModels: [
+      {
+        name: "None",
+        model: "",
+      },
+      {
+        name: "AbsoluteReality",
+        model: "digiplay/AbsoluteReality_v1.8.1",
+      },
+      {
+        name: "epiCRealism",
+        model: "emilianJR/epiCRealism",
+      },
+      {
+        name: "DreamShaper",
+        model: "Lykon/DreamShaper",
+      },
+      {
+        name: "RealisticVision",
+        model: "SG161222/Realistic_Vision_V6.0_B1_noVAE",
+      },
+    ],
+    pipeline: "text-to-image",
+    supportsLCM: true,
+    supportsTurbo: false,
+    supportsLightning: false,
+    supportsAnimateLCM: true,
+    supportsAnimateDiff: true,
+    supportsAnimateDiffLightning: true,
+  },
+  {
+    name: "Openjourney",
+    model: "prompthero/openjourney-v4",
+    baseModels: [],
+    pipeline: "text-to-image",
+    supportsLCM: false,
+    supportsTurbo: false,
+    supportsLightning: false,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+  //
+  {
+    name: "SDXL",
+    model: "stabilityai/stable-diffusion-xl-base-1.0",
+    baseModels: [],
+    pipeline: "image-to-image",
+    supportsLCM: true,
+    supportsTurbo: false,
+    supportsLightning: true,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+  {
+    name: "pix2pix",
+    model: "timbrooks/instruct-pix2pix",
+    baseModels: [],
+    pipeline: "image-to-image",
+    supportsLCM: false,
+    supportsTurbo: false,
+    supportsLightning: false,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+  //
+  {
+    name: "SVD",
+    model: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+    baseModels: [],
+    pipeline: "image-to-video",
+    supportsLCM: true,
+    supportsTurbo: false,
+    supportsLightning: false,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+  {
+    name: "Coming soon!",
+    model: "runwayml/stable-diffusion-v1-5",
+    baseModels: [
+      {
+        name: "AbsoluteReality",
+        model: "digiplay/AbsoluteReality_v1.8.1",
+      },
+      {
+        name: "epiCRealism",
+        model: "emilianJR/epiCRealism",
+      },
+      {
+        name: "DreamShaper",
+        model: "Lykon/DreamShaper",
+      },
+      {
+        name: "RealisticVision",
+        model: "SG161222/Realistic_Vision_V6.0_B1_noVAE",
+      },
+    ],
+    pipeline: "image-to-video",
+    supportsLCM: true,
+    supportsTurbo: false,
+    supportsLightning: false,
+    supportsAnimateLCM: false,
+    supportsAnimateDiff: false,
+    supportsAnimateDiffLightning: false,
+  },
+];
 
 // Style templates. Replaces '{prompt}' with the actual prompt before sending the job request
 const templates = [
@@ -32,16 +169,9 @@ const templates = [
       "photo, deformed, black and white, realism, disfigured, low contrast",
   },
   {
-    name: "Anime",
-    template:
-      "anime artwork of {prompt} . anime style, key visual, vibrant, studio anime, highly detailed",
-    negative_prompt:
-      "photo, deformed, black and white, realism, disfigured, low contrast",
-  },
-  {
     name: "Cinematic",
     template:
-      "cinematic film still of {prompt} . shallow depth of field, vignette, highly detailed, high budget, bokeh, cinemascope, moody, epic, gorgeous, film grain, grainy",
+      "Cinematic Movie of {prompt} . shallow depth of field, vignette, highly detailed, high budget, bokeh, cinemascope, moody, epic, gorgeous, film grain, grainy",
     negative_prompt:
       "anime, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured",
   },
@@ -65,13 +195,6 @@ const templates = [
       "photographic, realistic, realism, 35mm film, dslr, cropped, frame, text, deformed, glitch, noise, noisy, off-center, deformed, cross-eyed, closed eyes, bad anatomy, ugly, disfigured, sloppy, duplicate, mutated, black and white",
   },
   {
-    name: "Isometric",
-    template:
-      "isometric style {prompt} . vibrant, beautiful, crisp, detailed, ultra detailed, intricate",
-    negative_prompt:
-      "deformed, mutated, ugly, disfigured, blur, blurry, noise, noisy, realistic, photographic",
-  },
-  {
     name: "Landscape",
     template:
       "{prompt}, close shot 35 mm, realism, octane render, 8k, exploration, cinematic, artstation, 35 mm camera, unreal engine, hyper detailed, photo - realistic maximum detail, volumetric light, moody cinematic epic concept art, realistic matte painting, hyper photorealistic, epic, artstation, movie concept art, cinematic composition, ultra - detailed, realistic",
@@ -80,7 +203,7 @@ const templates = [
   {
     name: "Photo",
     template:
-      "cinematic photo of {prompt} . 35mm photograph, film, bokeh, soft light, professional, 4k, extremely detailed, Nikon D850, (35mm|50mm|85mm), award winning photography",
+      "cinematic photo of {prompt} . 35mm photograph, Hyperdetailed Photography, film, bokeh, soft light, professional, 4k, extremely detailed, Nikon D850, (35mm|50mm|85mm), award winning photography",
     negative_prompt:
       "drawing, painting, crayon, sketch, graphite, impressionist, noisy, blurry, soft, deformed, ugly",
   },
@@ -135,15 +258,20 @@ const motions = [
 
 export default function Home() {
   // Pipeline names to display on the UI and send to the worker
-  const [pipelineName, setPipelineName] = useState("txt2img");
-  const [pipeline, setPipeline] = useState("text-to-image");
+  const [pipeline, setPipeline] = useState("CREATE");
   // Model names to display on the UI and send to the worker
-  const [modelName, setModelName] = useState("SDXL++");
-  const [model, setModel] = useState(
-    "stabilityai/stable-diffusion-xl-base-1.0"
-  );
-  // Hidden property which auto-adjusts resolution based on workflow
-  const [quality, setQuality] = useState("HD");
+  const [model, setModel] = useState({
+    name: "SDXL",
+    model: "stabilityai/stable-diffusion-xl-base-1.0",
+    baseModel: "",
+    pipeline: "text-to-image",
+    enableLCM: false,
+    enableTurbo: false,
+    enableLightning: false,
+    enableAnimateLCM: false,
+    enableAnimateDiff: false,
+  });
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
   // Prompt given by user
   const [prompt, setPrompt] = useState(
     examplePrompts[Math.floor(Math.random() * examplePrompts.length)]
@@ -163,49 +291,66 @@ export default function Home() {
   // WS API connection variables
   const [maxQueue, workers, queue, images, videos] = useApi(HTTP_URL, WS_URL);
 
-  // Adjusts (hidden) params on pipeline change
-  function handlePipelineChange(newVal, newName) {
-    if (newVal == "text-to-image") {
-      setModel("stabilityai/stable-diffusion-xl-base-1.0");
-      setModelName("SDXL++");
-      setQuality("HD");
+  let thisModelInfo;
+  for (const tmpModel of models) {
+    if (tmpModel.pipeline != model.pipeline) {
+      continue;
     }
-    if (newVal == "image-to-image") {
-      setModel("stabilityai/sdxl-turbo");
-      setModelName("SDXL Turbo");
-      setQuality("HD");
+    if (tmpModel.model != model.model) {
+      continue;
     }
-    if (newVal == "image-to-video") {
-      setModel("stabilityai/stable-video-diffusion-img2vid-xt-1-1");
-      setModelName("SVD XT");
-      setQuality("SD");
+    thisModelInfo = tmpModel;
+    break;
+  }
+
+  // Adjusts (hidden) params on pipeline change (newVal == "CREATE" || "ENHANCE" || "ANIMATE")
+  function handlePipelineChange(newVal) {
+    if (newVal == "CREATE") {
+      setModel({
+        name: "SDXL",
+        model: "stabilityai/stable-diffusion-xl-base-1.0",
+        baseModel: "",
+        pipeline: "text-to-image",
+        enableLCM: false,
+        enableTurbo: false,
+        enableLightning: false,
+        enableAnimateLCM: false,
+        enableAnimateDiff: false,
+        enableAnimateDiffLightning: false,
+      });
+      setMotion("");
     }
-    if (newVal == "text-to-video") {
-      setModel("ByteDance/AnimateDiff");
-      setModelName("AnimateDiff");
-      setQuality("SD");
+    if (newVal == "ENHANCE") {
+      setModel({
+        name: "SDXL",
+        model: "stabilityai/stable-diffusion-xl-base-1.0",
+        baseModel: "",
+        pipeline: "image-to-image",
+        enableLCM: false,
+        enableTurbo: false,
+        enableLightning: false,
+        enableAnimateLCM: false,
+        enableAnimateDiff: false,
+        enableAnimateDiffLightning: false,
+      });
+      setMotion("");
     }
-    if (newVal == "video-to-video") {
-      setModel("ByteDance/AnimateDiff");
-      setModelName("AnimateDiff");
-      setQuality("SD");
-    } else {
+    if (newVal == "ANIMATE") {
+      setModel({
+        name: "SVD",
+        model: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
+        baseModel: "",
+        pipeline: "image-to-video",
+        enableLCM: false,
+        enableTurbo: false,
+        enableLightning: false,
+        enableAnimateLCM: false,
+        enableAnimateDiff: false,
+        enableAnimateDiffLightning: false,
+      });
       setMotion("");
     }
     setPipeline(newVal);
-    setPipelineName(newName);
-  }
-
-  // Adjusts (hidden) params on model change
-  function handleModelChange(newVal) {
-    if (pipeline == "text-to-image") {
-      if (newVal == "stabilityai/stable-diffusion-xl-base-1.0") {
-        setQuality("HD");
-      } else {
-        setQuality("SD");
-      }
-    }
-    setModel(newVal);
   }
 
   function handlePromptChange(newVal) {
@@ -220,6 +365,26 @@ export default function Home() {
 
   // Take state and request job from API
   function handleSubmit() {
+    let speedup_module = "";
+    let animate_module = "";
+    if (model.enableLCM){
+      speedup_module = "LCM"
+    }
+    if (model.enableTurbo){
+      speedup_module = "Turbo"
+    }
+    if (model.enableLightning){
+      speedup_module = "Lightning"
+    }
+    if (model.enableAnimateLCM){
+      animate_module = "LCM"
+    }
+    if (model.enableAnimateDiff){
+      animate_module = "AnimateDiff"
+    }
+    if (model.enableAnimateDiffLightning){
+      animate_module = "AnimateDiffLightning"
+    }
     fetch(HTTP_URL + "/tokenize", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -227,10 +392,12 @@ export default function Home() {
         prompt: replaceMe(template, { prompt: prompt }),
         negative_prompt: negative_prompt,
         motion: motion,
-        model_id: model,
         image: pipeline == "video-to-video" ? selectedVideo : selectedImage,
-        pipeline: pipeline,
-        quality: quality,
+        model: model.model,
+        baseModel: model.baseModel,
+        pipeline: model.pipeline,
+        speedup_module: speedup_module,
+        animate_module: animate_module,
       }),
     }).then((res) => {
       console.log(res);
@@ -258,13 +425,13 @@ export default function Home() {
     disabled = true;
     message = "Queue is full";
   }
-  if (pipeline == "image-to-image" || pipeline == "image-to-video") {
+  if (model.pipeline == "image-to-image" || model.pipeline == "image-to-video") {
     if (!selectedPreview == selectedImage) {
       disabled = true;
       message = "Select a source image";
     }
   }
-  if (pipeline == "video-to-video") {
+  if (model.pipeline == "video-to-video") {
     if (!selectedPreview == selectedVideo) {
       disabled = true;
       message = "Select a source video";
@@ -282,20 +449,7 @@ export default function Home() {
   return (
     <div className="container">
       <div className="top">
-        <HeaderForm
-          pipeline={pipeline}
-          setPipeline={setPipeline}
-          pipelineName={pipelineName}
-          setPipelineName={setPipelineName}
-          model={model}
-          setModel={setModel}
-          modelName={modelName}
-          setModelName={setModelName}
-          setQuality={setQuality}
-          setMotion={setMotion}
-          handlePipelineChange={handlePipelineChange}
-          handleModelChange={handleModelChange}
-        />
+        <HeaderForm pipeline={pipeline} setPipeline={handlePipelineChange} />
       </div>
       <div className="bot">
         {/* Left sidebar */}
@@ -306,9 +460,457 @@ export default function Home() {
             borderLeft: "2px solid rgba(0,0,0,0.2)",
           }}
         >
-          <h3 style={{ color: "#ffffff", alignSelf: "center" }}>
-            Create {pipeline}
-          </h3>
+          <h3 style={{ color: "#ffffff", alignSelf: "center" }}>{pipeline}</h3>
+          {pipeline == "ENHANCE" ? (
+            <p>Frame interpolation and image inpainting coming soon!</p>
+          ) : null}
+          {model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning ? (
+            <p>Try out a few different base models!</p>
+          ) : null}
+          {model.pipeline == "image-to-video" ? (
+            <p>
+              Lightning quick and directable AnimateDiff+SparseCtrl coming soon!
+            </p>
+          ) : null}
+          {model.model == "prompthero/openjourney-v4" ? (
+            <p>This model has not been optimized yet.</p>
+          ) : null}
+          {/* Model selection */}
+          <p style={{ color: "#ffffff", alignSelf: "center" }}>Model</p>
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            {models.map((item, idx) =>
+              model.pipeline == item.pipeline ? (
+                <div
+                  key={item.name + "-model-" + idx}
+                  className={
+                    model.model == item.model
+                      ? "style-button border"
+                      : "style-button"
+                  }
+                  style={
+                    item.model == "runwayml/stable-diffusion-v1-5" &&
+                    item.pipeline == "image-to-video"
+                      ? {
+                          backgroundColor: "grey",
+                          cursor: "inherit",
+                          flex: 1,
+                          height: "100%",
+                          alignContent: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          padding: 0,
+                        }
+                      : {
+                          cursor: "pointer",
+                          flex: 1,
+                          height: "100%",
+                          padding: 0,
+                          alignContent: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "40px",
+                        }
+                  }
+                  onClick={() => {
+                    if (
+                      item.model == "runwayml/stable-diffusion-v1-5" &&
+                      item.pipeline == "image-to-video"
+                    ) {
+                      return;
+                    }
+                    model.enableLCM = false;
+                    model.enableTurbo = false;
+                    model.enableLightning = false;
+                    model.enableAnimateLCM = false;
+                    model.enableAnimateDiff = false;
+                    model.enableAnimateDiffLightning = false;
+                    model.model = item.model;
+                    model.baseModel = "";
+                    setModel(model);
+                    // Because the ref doesn't actually change, force rerender
+                    forceUpdate();
+                  }}
+                >
+                  {item.name}
+                </div>
+              ) : null
+            )}
+          </div>
+          {/* Base model selection */}
+          {thisModelInfo?.baseModels?.length ? (
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>Base Model</p>
+          ) : null}
+          {thisModelInfo?.baseModels?.length ? (
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              {thisModelInfo.baseModels.map((item, idx) => (
+                <div
+                  key={item.name + "-model-" + idx}
+                  className={
+                    model.baseModel == item.model
+                      ? "style-button border"
+                      : "style-button"
+                  }
+                  style={{
+                    padding: 0,
+                    alignContent: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flex: "1",
+                    height: "40px",
+                  }}
+                  onClick={() => {
+                    model.baseModel = item.model;
+                    setModel(model);
+                    // Because the ref doesn't actually change, force rerender
+                    forceUpdate();
+                  }}
+                >
+                  {item.name}
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {/* Speedup selection */}
+          <p style={{ color: "#ffffff", alignSelf: "center" }}>Speedup</p>
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <div
+              className={
+                !model.enableLCM && !model.enableTurbo && !model.enableLightning
+                  ? "style-button border"
+                  : "style-button"
+              }
+              style={{
+                padding: 0,
+                alignContent: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                flex: "1",
+                height: "40px",
+              }}
+              onClick={() => {
+                model.enableLCM = false;
+                model.enableTurbo = false;
+                model.enableLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              None
+            </div>
+            <div
+              className={
+                model.enableTurbo ? "style-button border" : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsTurbo || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsTurbo || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                  return;
+                }
+                model.enableLCM = false;
+                model.enableTurbo = true;
+                model.enableLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              Turbo
+            </div>
+            <div
+              className={
+                model.enableLightning ? "style-button border" : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsLightning|| (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsLightning || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                  return;
+                }
+                model.enableLCM = false;
+                model.enableTurbo = false;
+                model.enableLightning = true;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              Lightning
+            </div>
+            <div
+              className={
+                model.enableLCM ? "style-button border" : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsLCM || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsLCM || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                  return;
+                }
+                model.enableLCM = true;
+                model.enableTurbo = false;
+                model.enableLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              LCM
+            </div>
+          </div>
+          {/* Animation selection */}
+          <p style={{ color: "#ffffff", alignSelf: "center" }}>Animate</p>
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <div
+              className={
+                !model.enableAnimateLCM &&
+                !model.enableAnimateDiff &&
+                !model.enableAnimateDiffLightning
+                  ? "style-button border"
+                  : "style-button"
+              }
+              style={{
+                padding: 0,
+                alignContent: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                flex: "1",
+                height: "40px",
+              }}
+              onClick={() => {
+                model.enableAnimateLCM = false;
+                model.enableAnimateDiff = false;
+                model.enableAnimateDiffLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              None
+            </div>
+            <div
+              className={
+                model.enableAnimateDiff ? "style-button border" : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsAnimateDiff
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsAnimateDiff) {
+                  return;
+                }
+                model.enableAnimateLCM = false;
+                model.enableAnimateDiff = true;
+                model.enableAnimateDiffLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              Slow
+            </div>
+            <div
+              className={
+                model.enableAnimateDiffLightning
+                  ? "style-button border"
+                  : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsAnimateDiffLightning
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsAnimateDiffLightning) {
+                  return;
+                }
+                model.enableAnimateLCM = false;
+                model.enableAnimateDiff = false;
+                model.enableAnimateDiffLightning = true;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              Lightning
+            </div>
+            <div
+              className={
+                model.enableAnimateLCM ? "style-button border" : "style-button"
+              }
+              style={
+                !thisModelInfo.supportsAnimateLCM
+                  ? {
+                      backgroundColor: "grey",
+                      cursor: "inherit",
+                      flex: 1,
+                      height: "100%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: 0,
+                    }
+                  : {
+                      cursor: "pointer",
+                      flex: 1,
+                      height: "100%",
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "40px",
+                    }
+              }
+              onClick={() => {
+                if (!thisModelInfo.supportsAnimateLCM) {
+                  return;
+                }
+                model.enableAnimateLCM = true;
+                model.enableAnimateDiff = false;
+                model.enableAnimateDiffLightning = false;
+                setModel(model);
+                // Because the ref doesn't actually change, force rerender
+                forceUpdate();
+              }}
+            >
+              LCM
+            </div>
+          </div>
+          {/* Prompt input */}
           <div
             style={{
               display: "flex",
@@ -318,45 +920,38 @@ export default function Home() {
               flexDirection: "column",
             }}
           >
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flex: 1,
-                justifyContent: "stretch",
-                alignItems: "stretch",
-                maxHeight: "400px",
-              }}
-            >
-              <textarea
-                value={
-                  pipeline == "image-to-video" &&
-                  model == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
-                    ? "This model supports no text input"
-                    : prompt
-                }
-                placeholder={"Prompt"}
+            {model.model !=
+            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
+              <div
                 style={{
                   width: "100%",
                   height: "100%",
-                  marginLeft: "0.2em",
-                  marginRight: "0.2em",
+                  display: "flex",
+                  flex: 1,
+                  justifyContent: "stretch",
+                  alignItems: "stretch",
+                  maxHeight: "400px",
                 }}
-                onChange={(e) => handlePromptChange(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={
-                  pipeline == "image-to-video" &&
-                  model == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
-                }
-              />
-            </div>
-            {pipeline == "text-to-video" &&
-            (model == "ByteDance/AnimateDiff-Lightning") ? (
+              >
+                <textarea
+                  value={prompt}
+                  placeholder={"Prompt"}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    marginLeft: "0.2em",
+                    marginRight: "0.2em",
+                  }}
+                  onChange={(e) => handlePromptChange(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />{" "}
+              </div>
+            ) : null}
+            {/* AnimateDiff-Lightning supports camera direction */}
+            {model.enableAnimateDiffLightning ? (
               <p style={{ color: "#ffffff", alignSelf: "center" }}>Motion</p>
             ) : null}
-            {pipeline == "text-to-video" &&
-            (model == "ByteDance/AnimateDiff-Lightning") ? (
+            {model.enableAnimateDiffLightning ? (
               <div className="grid">
                 <div className="grid-grid">
                   {motions.map((item, idx) => (
@@ -383,7 +978,8 @@ export default function Home() {
                 </div>
               </div>
             ) : null}
-            {model != "timbrooks/instruct-pix2pix" ? (
+            {/* Disclaimer for sucky img2img model */}
+            {model.model != "timbrooks/instruct-pix2pix" ? (
               <p style={{ color: "#ffffff", alignSelf: "center" }}>Style</p>
             ) : (
               <p style={{ color: "#ffffff", alignSelf: "center" }}>
@@ -392,7 +988,8 @@ export default function Home() {
                 “turn the clouds rainy”.
               </p>
             )}
-            {model != "timbrooks/instruct-pix2pix" ? (
+            {/* Style templates! */}
+            {model.model != "timbrooks/instruct-pix2pix" ? (
               <div className="grid">
                 <div className="grid-grid">
                   {templates.map((item, idx) => (
@@ -421,7 +1018,7 @@ export default function Home() {
                 </div>
               </div>
             ) : null}
-
+            {/* Some padding between the submit section */}
             <div
               style={{
                 color: "#ffffff",
@@ -434,7 +1031,7 @@ export default function Home() {
                 flex: 1,
               }}
             />
-
+            {/* Submit + preview section */}
             <div
               style={{
                 display: "flex",
@@ -444,8 +1041,9 @@ export default function Home() {
                 marginBottom: "1em",
               }}
             >
-              {(pipeline == "video-to-video" && selectedVideo != "") ||
-              ((pipeline == "image-to-video" || pipeline == "image-to-image") &&
+              {(model.pipeline == "video-to-video" && selectedVideo != "") ||
+              ((model.pipeline == "image-to-video" ||
+                model.pipeline == "image-to-image") &&
                 selectedImage != "") ? (
                 <div
                   style={{
@@ -456,7 +1054,7 @@ export default function Home() {
                     flex: 1,
                   }}
                 >
-                  {pipeline == "video-to-video" ? (
+                  {model.pipeline == "video-to-video" ? (
                     <video
                       src={HTTP_URL + "/videos/" + selectedPreview}
                       style={{
