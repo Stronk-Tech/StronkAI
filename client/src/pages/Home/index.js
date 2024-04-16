@@ -159,6 +159,7 @@ export default function Home() {
   const [selectedPreview, setPreview] = useState("");
   // Path to source asset to use as input for the AI worker
   const [selectedImage, setImage] = useState("");
+  const [selectedVideo, setVideo] = useState("");
   // WS API connection variables
   const [maxQueue, workers, queue, images, videos] = useApi(HTTP_URL, WS_URL);
 
@@ -170,8 +171,8 @@ export default function Home() {
       setQuality("HD");
     }
     if (newVal == "image-to-image") {
-      setModel("timbrooks/instruct-pix2pix");
-      setModelName("pix2pix");
+      setModel("stabilityai/sdxl-turbo");
+      setModelName("SDXL Turbo");
       setQuality("HD");
     }
     if (newVal == "image-to-video") {
@@ -180,7 +181,12 @@ export default function Home() {
       setQuality("SD");
     }
     if (newVal == "text-to-video") {
-      setModel("ByteDance/AnimateDiff-Lightning");
+      setModel("ByteDance/AnimateDiff");
+      setModelName("AnimateDiff");
+      setQuality("SD");
+    }
+    if (newVal == "video-to-video") {
+      setModel("ByteDance/AnimateDiff");
       setModelName("AnimateDiff");
       setQuality("SD");
     } else {
@@ -222,7 +228,7 @@ export default function Home() {
         negative_prompt: negative_prompt,
         motion: motion,
         model_id: model,
-        image: selectedImage,
+        image: pipeline == "video-to-video" ? selectedVideo : selectedImage,
         pipeline: pipeline,
         quality: quality,
       }),
@@ -234,12 +240,14 @@ export default function Home() {
   // Sets job image source and preview source
   function setImgSource(newVal) {
     setImage(newVal || "");
+    setVideo("");
     setPreview(newVal || "");
   }
 
   // Clears job image source and sets preview source
   function setVidSource(newVal) {
     setImage("");
+    setVideo(newVal || "");
     setPreview(newVal || "");
   }
 
@@ -254,6 +262,12 @@ export default function Home() {
     if (!selectedPreview == selectedImage) {
       disabled = true;
       message = "Select a source image";
+    }
+  }
+  if (pipeline == "video-to-video") {
+    if (!selectedPreview == selectedVideo) {
+      disabled = true;
+      message = "Select a source video";
     }
   }
 
@@ -338,11 +352,11 @@ export default function Home() {
               />
             </div>
             {pipeline == "text-to-video" &&
-            model == "ByteDance/AnimateDiff-Lightning" ? (
+            (model == "ByteDance/AnimateDiff-Lightning") ? (
               <p style={{ color: "#ffffff", alignSelf: "center" }}>Motion</p>
             ) : null}
             {pipeline == "text-to-video" &&
-            model == "ByteDance/AnimateDiff-Lightning" ? (
+            (model == "ByteDance/AnimateDiff-Lightning") ? (
               <div className="grid">
                 <div className="grid-grid">
                   {motions.map((item, idx) => (
@@ -430,8 +444,9 @@ export default function Home() {
                 marginBottom: "1em",
               }}
             >
-              {(pipeline == "image-to-video" || pipeline == "image-to-image") &&
-              selectedImage != "" ? (
+              {(pipeline == "video-to-video" && selectedVideo != "") ||
+              ((pipeline == "image-to-video" || pipeline == "image-to-image") &&
+                selectedImage != "") ? (
                 <div
                   style={{
                     justifyContent: "center",
@@ -441,15 +456,27 @@ export default function Home() {
                     flex: 1,
                   }}
                 >
-                  <img
-                    src={HTTP_URL + "/images/" + selectedPreview}
-                    style={{
-                      objectFit: "cover",
-                      maxHeight: "70px",
-                      maxWidth: "70px",
-                      aspectRatio: "initial",
-                    }}
-                  ></img>
+                  {pipeline == "video-to-video" ? (
+                    <video
+                      src={HTTP_URL + "/videos/" + selectedPreview}
+                      style={{
+                        objectFit: "cover",
+                        maxHeight: "70px",
+                        maxWidth: "70px",
+                        aspectRatio: "initial",
+                      }}
+                    ></video>
+                  ) : (
+                    <img
+                      src={HTTP_URL + "/images/" + selectedPreview}
+                      style={{
+                        objectFit: "cover",
+                        maxHeight: "70px",
+                        maxWidth: "70px",
+                        aspectRatio: "initial",
+                      }}
+                    ></img>
+                  )}
                 </div>
               ) : (
                 <div

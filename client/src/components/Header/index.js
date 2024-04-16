@@ -62,6 +62,11 @@ const models = [
   },
   {
     name: "AnimateDiff",
+    model: "ByteDance/AnimateDiff",
+    pipeline: "text-to-video",
+  },
+  {
+    name: "AnimateDiff Lightning",
     model: "ByteDance/AnimateDiff-Lightning",
     pipeline: "text-to-video",
   },
@@ -69,6 +74,11 @@ const models = [
     name: "Vilab",
     model: "ali-vilab/text-to-video-ms-1.7b",
     pipeline: "text-to-video",
+  },
+  {
+    name: "SDXL Turbo",
+    model: "stabilityai/sdxl-turbo",
+    pipeline: "image-to-image",
   },
   {
     name: "pix2pix",
@@ -86,11 +96,6 @@ const models = [
     pipeline: "image-to-image",
   },
   {
-    name: "SDXL Turbo",
-    model: "stabilityai/sdxl-turbo",
-    pipeline: "image-to-image",
-  },
-  {
     name: "SVD XT",
     model: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
     pipeline: "image-to-video",
@@ -99,6 +104,11 @@ const models = [
     name: "i2vgen",
     model: "ali-vilab/i2vgen-xl",
     pipeline: "image-to-video",
+  },
+  {
+    name: "AnimateDiff",
+    model: "ByteDance/AnimateDiff",
+    pipeline: "video-to-video",
   },
 ];
 
@@ -172,6 +182,18 @@ export default function Header(props) {
       >
         text2vid
       </div>
+      {/* <div
+        className={
+          props.pipeline == "video-to-video"
+            ? "dropdown-item border"
+            : "dropdown-item"
+        }
+        onClick={() => {
+          props.handlePipelineChange("video-to-video", "vid2vid");
+        }}
+      >
+        vid2vid
+      </div> */}
       <div className="dropdown">
         <p className="dropdown-button" style={{ marginLeft: "1em" }}>
           &#8595; Model &#8595;
