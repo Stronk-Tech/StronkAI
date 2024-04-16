@@ -275,7 +275,7 @@ const mint = (workerIdx, job) => {
       speedup_module: job.speedup_module,
       animate_module: job.animate_module,
     };
-    if (pipeline == "video-to-video") {
+    if (job.pipeline == "video-to-video") {
       formData.video = fs.createReadStream(job.source);
     } else {
       formData.image = fs.createReadStream(job.source);
@@ -298,6 +298,14 @@ const mint = (workerIdx, job) => {
       );
       if (err) {
         console.log(err);
+        workers[workerIdx].busy = false;
+        wsServer.broadcast(
+          JSON.stringify({
+            queue: queue,
+            workers: workers,
+            maxQueueSize: maxQueueSize,
+          })
+        );
         return;
       }
       onResult(JSON.parse(body), job.pipeline);
@@ -394,19 +402,21 @@ app.post("/tokenize", (req, res) => {
 
   let width = 512;
   let height = 512;
-  if (pipeline == "image-to-video"){
-    if (model_id == "ali-vilab/i2vgen-xl"){
+  if (pipeline == "image-to-video") {
+    if (model_id == "ali-vilab/i2vgen-xl") {
       width = 768;
       height = 768;
-    }else if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"){
+    } else if (
+      model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
+    ) {
       width = 1024;
       height = 576;
     }
-  } else if (pipeline == "text-to-image"){
-    if (model_id == "stabilityai/stable-diffusion-xl-base-1.0"){
+  } else if (pipeline == "text-to-image") {
+    if (model_id == "stabilityai/stable-diffusion-xl-base-1.0") {
       width = 1024;
       height = 1024;
-    }else if (model_id == "runwayml/stable-diffusion-v1-5"){
+    } else if (model_id == "runwayml/stable-diffusion-v1-5") {
       width = 768;
       height = 768;
     }
@@ -417,46 +427,46 @@ app.post("/tokenize", (req, res) => {
   if (model_id == "stabilityai/stable-diffusion-xl-base-1.0") {
     if (speedup_module == "Turbo") {
       speedup_module = "";
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
-        base_model_id = ""
-        model_id = "Lykon/dreamshaper-xl-v2-turbo"
-      }else{
-        base_model_id = ""
-        model_id = "stabilityai/sdxl-turbo"
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
+        base_model_id = "";
+        model_id = "Lykon/dreamshaper-xl-v2-turbo";
+      } else {
+        base_model_id = "";
+        model_id = "stabilityai/sdxl-turbo";
       }
-    }else if (speedup_module == "Lightning") {
+    } else if (speedup_module == "Lightning") {
       speedup_module = "";
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
-        base_model_id = ""
-        model_id = "Lykon/dreamshaper-xl-lightning"
-      }else{
-        base_model_id = ""
-        model_id = "ByteDance/SDXL-Lightning"
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
+        base_model_id = "";
+        model_id = "Lykon/dreamshaper-xl-lightning";
+      } else {
+        base_model_id = "";
+        model_id = "ByteDance/SDXL-Lightning";
       }
-    }else{
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0"){
-        base_model_id = ""
-        model_id = "Lykon/dreamshaper-xl-1-0"
+    } else {
+      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
+        base_model_id = "";
+        model_id = "Lykon/dreamshaper-xl-1-0";
       }
     }
-  }else if (animate_module != "") {
-    if (base_model_id == ""){
-      base_model_id == "runwayml/stable-diffusion-v1-5"
+  } else if (animate_module != "") {
+    if (base_model_id == "") {
+      base_model_id == "runwayml/stable-diffusion-v1-5";
     }
-    if (animate_module == "LCM"){
-      model_id = "wangfuyun/AnimateLCM"
-    }else if (animate_module == "AnimateDiff"){
-      model_id = "ByteDance/AnimateDiff"
-    }else if (animate_module == "AnimateDiffLightning"){
-      model_id = "ByteDance/AnimateDiff-Lightning"
+    if (animate_module == "LCM") {
+      model_id = "wangfuyun/AnimateLCM";
+    } else if (animate_module == "AnimateDiff") {
+      model_id = "ByteDance/AnimateDiff";
+    } else if (animate_module == "AnimateDiffLightning") {
+      model_id = "ByteDance/AnimateDiff-Lightning";
     }
-  } else if (base_model_id != ""){
+  } else if (base_model_id != "") {
     // Since we don't support hot-swapping base models at the moment
     // request it as a dedicated model in the pipeline, which is supported.
     // model_id = base_model_id;
     // base_model_id = "";
   }
-  if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1"){
+  if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
     if (speedup_module == "LCM") {
       model_id = "wangfuyun/AnimateLCM-SVD-xt";
       base_model_id = "";

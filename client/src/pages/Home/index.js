@@ -367,23 +367,23 @@ export default function Home() {
   function handleSubmit() {
     let speedup_module = "";
     let animate_module = "";
-    if (model.enableLCM){
-      speedup_module = "LCM"
+    if (model.enableLCM) {
+      speedup_module = "LCM";
     }
-    if (model.enableTurbo){
-      speedup_module = "Turbo"
+    if (model.enableTurbo) {
+      speedup_module = "Turbo";
     }
-    if (model.enableLightning){
-      speedup_module = "Lightning"
+    if (model.enableLightning) {
+      speedup_module = "Lightning";
     }
-    if (model.enableAnimateLCM){
-      animate_module = "LCM"
+    if (model.enableAnimateLCM) {
+      animate_module = "LCM";
     }
-    if (model.enableAnimateDiff){
-      animate_module = "AnimateDiff"
+    if (model.enableAnimateDiff) {
+      animate_module = "AnimateDiff";
     }
-    if (model.enableAnimateDiffLightning){
-      animate_module = "AnimateDiffLightning"
+    if (model.enableAnimateDiffLightning) {
+      animate_module = "AnimateDiffLightning";
     }
     fetch(HTTP_URL + "/tokenize", {
       method: "POST",
@@ -425,7 +425,10 @@ export default function Home() {
     disabled = true;
     message = "Queue is full";
   }
-  if (model.pipeline == "image-to-image" || model.pipeline == "image-to-video") {
+  if (
+    model.pipeline == "image-to-image" ||
+    model.pipeline == "image-to-video"
+  ) {
     if (!selectedPreview == selectedImage) {
       disabled = true;
       message = "Select a source image";
@@ -464,7 +467,9 @@ export default function Home() {
           {pipeline == "ENHANCE" ? (
             <p>Frame interpolation and image inpainting coming soon!</p>
           ) : null}
-          {model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning ? (
+          {model.enableAnimateLCM ||
+          model.enableAnimateDiff ||
+          model.enableAnimateDiffLightning ? (
             <p>Try out a few different base models!</p>
           ) : null}
           {model.pipeline == "image-to-video" ? (
@@ -627,7 +632,10 @@ export default function Home() {
                 model.enableTurbo ? "style-button border" : "style-button"
               }
               style={
-                !thisModelInfo.supportsTurbo || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                !thisModelInfo.supportsTurbo ||
+                model.enableAnimateLCM ||
+                model.enableAnimateDiff ||
+                model.enableAnimateDiffLightning
                   ? {
                       backgroundColor: "grey",
                       cursor: "inherit",
@@ -650,7 +658,12 @@ export default function Home() {
                     }
               }
               onClick={() => {
-                if (!thisModelInfo.supportsTurbo || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                if (
+                  !thisModelInfo.supportsTurbo ||
+                  model.enableAnimateLCM ||
+                  model.enableAnimateDiff ||
+                  model.enableAnimateDiffLightning
+                ) {
                   return;
                 }
                 model.enableLCM = false;
@@ -668,7 +681,10 @@ export default function Home() {
                 model.enableLightning ? "style-button border" : "style-button"
               }
               style={
-                !thisModelInfo.supportsLightning|| (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                !thisModelInfo.supportsLightning ||
+                model.enableAnimateLCM ||
+                model.enableAnimateDiff ||
+                model.enableAnimateDiffLightning
                   ? {
                       backgroundColor: "grey",
                       cursor: "inherit",
@@ -691,7 +707,12 @@ export default function Home() {
                     }
               }
               onClick={() => {
-                if (!thisModelInfo.supportsLightning || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                if (
+                  !thisModelInfo.supportsLightning ||
+                  model.enableAnimateLCM ||
+                  model.enableAnimateDiff ||
+                  model.enableAnimateDiffLightning
+                ) {
                   return;
                 }
                 model.enableLCM = false;
@@ -709,7 +730,10 @@ export default function Home() {
                 model.enableLCM ? "style-button border" : "style-button"
               }
               style={
-                !thisModelInfo.supportsLCM || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)
+                !thisModelInfo.supportsLCM ||
+                model.enableAnimateLCM ||
+                model.enableAnimateDiff ||
+                model.enableAnimateDiffLightning
                   ? {
                       backgroundColor: "grey",
                       cursor: "inherit",
@@ -732,7 +756,12 @@ export default function Home() {
                     }
               }
               onClick={() => {
-                if (!thisModelInfo.supportsLCM || (model.enableAnimateLCM || model.enableAnimateDiff || model.enableAnimateDiffLightning)) {
+                if (
+                  !thisModelInfo.supportsLCM ||
+                  model.enableAnimateLCM ||
+                  model.enableAnimateDiff ||
+                  model.enableAnimateDiffLightning
+                ) {
                   return;
                 }
                 model.enableLCM = true;
@@ -979,17 +1008,15 @@ export default function Home() {
               </div>
             ) : null}
             {/* Disclaimer for sucky img2img model */}
-            {model.model != "timbrooks/instruct-pix2pix" ? (
+            {model.model != "timbrooks/instruct-pix2pix" &&
+            model.model !=
+              "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
               <p style={{ color: "#ffffff", alignSelf: "center" }}>Style</p>
-            ) : (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>
-                Be descriptive! This model is trained to edit images from
-                human-provided instructions. For example, your prompt can be
-                “turn the clouds rainy”.
-              </p>
-            )}
+            ) : null}
             {/* Style templates! */}
-            {model.model != "timbrooks/instruct-pix2pix" ? (
+            {model.model != "timbrooks/instruct-pix2pix" &&
+            model.model !=
+              "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
               <div className="grid">
                 <div className="grid-grid">
                   {templates.map((item, idx) => (
