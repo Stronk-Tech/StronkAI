@@ -592,7 +592,7 @@ export default function Home() {
             </div>
           ) : null}
           {/* Speedup selection */}
-          <p style={{ color: "#ffffff", alignSelf: "center" }}>Speedup</p>
+          <p style={{ color: "#ffffff", alignSelf: "center" }}>Speedup Module</p>
           <div
             style={{
               display: "flex",
@@ -674,7 +674,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Fast
+              Turbo
             </div>
             <div
               className={
@@ -723,7 +723,7 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Faster
+              Lightning
             </div>
             <div
               className={
@@ -772,14 +772,14 @@ export default function Home() {
                 forceUpdate();
               }}
             >
-              Fastest
+              LCM
             </div>
           </div>
           {/* Animation selection */}
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
           thisModelInfo?.supportsAnimateDiffLightning ? (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>Animate</p>
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>Animation Module</p>
           ) : null}
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
@@ -861,7 +861,7 @@ export default function Home() {
                   forceUpdate();
                 }}
               >
-                Slow
+                AnimateDiff
               </div>
               <div
                 className={
@@ -904,7 +904,7 @@ export default function Home() {
                   forceUpdate();
                 }}
               >
-                Faster
+                Lightning
               </div>
               <div
                 className={
@@ -947,7 +947,7 @@ export default function Home() {
                   forceUpdate();
                 }}
               >
-                Fastest
+                AnimateLCM
               </div>
             </div>
           ) : null}
