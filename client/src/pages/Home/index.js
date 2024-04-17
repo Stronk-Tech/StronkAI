@@ -522,7 +522,7 @@ export default function Home() {
                           backgroundColor: "grey",
                           cursor: "inherit",
                           flex: 1,
-                          height: "100%",
+                          height: "40px",
                           alignContent: "center",
                           justifyContent: "center",
                           alignItems: "center",
@@ -531,7 +531,6 @@ export default function Home() {
                       : {
                           cursor: "pointer",
                           flex: 1,
-                          height: "100%",
                           padding: 0,
                           alignContent: "center",
                           justifyContent: "center",
@@ -569,41 +568,33 @@ export default function Home() {
             <p style={{ color: "#ffffff", alignSelf: "center" }}>Base Model</p>
           ) : null}
           {thisModelInfo?.baseModels?.length ? (
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-            >
-              {thisModelInfo.baseModels.map((item, idx) => (
-                <div
-                  key={item.name + "-model-" + idx}
-                  className={
-                    model.baseModel == item.model
-                      ? "style-button border"
-                      : "style-button"
-                  }
-                  style={{
-                    padding: 0,
-                    alignContent: "center",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flex: "1",
-                    height: "40px",
-                  }}
-                  onClick={() => {
-                    model.baseModel = item.model;
-                    setModel(model);
-                    // Because the ref doesn't actually change, force rerender
-                    forceUpdate();
-                  }}
-                >
-                  {item.name}
-                </div>
-              ))}
+            <div className="grid">
+              <div className="grid-grid">
+                {thisModelInfo.baseModels.map((item, idx) => (
+                  <div
+                    key={item.name + "-model-" + idx}
+                    className={
+                      model.baseModel == item.model
+                        ? "style-button border"
+                        : "style-button"
+                    }
+                    style={{
+                      padding: 0,
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    onClick={() => {
+                      model.baseModel = item.model;
+                      setModel(model);
+                      // Because the ref doesn't actually change, force rerender
+                      forceUpdate();
+                    }}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
             </div>
           ) : null}
           {/* Speedup selection */}
@@ -978,6 +969,7 @@ export default function Home() {
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
+              marginTop: "0.5em"
             }}
           >
             {model.model !=
@@ -1001,6 +993,7 @@ export default function Home() {
                     height: "100%",
                     marginLeft: "0.2em",
                     marginRight: "0.2em",
+                    minHeight: "200px"
                   }}
                   onChange={(e) => handlePromptChange(e.target.value)}
                   onKeyDown={handleKeyDown}

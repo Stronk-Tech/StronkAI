@@ -6,7 +6,7 @@ import "./style.css";
 import ReactPaginate from "react-paginate";
 import useWindowDimensions from "./useWindowDimensions";
 
-const imageTotalSize = 70 + 20;
+const imageTotalSize = 70 + 25;
 const headerSize = 250;
 const previewSize = 400 + 0;
 const widthBreakpoint = 1024;

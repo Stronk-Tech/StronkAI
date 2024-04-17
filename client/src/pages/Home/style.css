@@ -18,15 +18,16 @@
 
   .bot { 
     display: flex;
+    flex: 1;
     flex-direction: row; 
-    height: 100%;
+    overflow: hidden;
   }
   
   .left { 
     display: flex;
     flex-direction: column;
     grid-area: left; 
-    overflow: hidden;
+    overflow: auto;
     flex: 1;
     background: rgba(56, 60, 62, 0.7);
   }
@@ -56,6 +57,7 @@
 
 .style-button {
    background-color: rgba(24, 26, 27, 0.77);
+   height: 40px;
     display: flex;
     border-radius: 1em;
     padding: 0;
@@ -71,6 +73,9 @@
 
 .grid {
   display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
 }
 
 .grid-grid {
@@ -83,7 +88,7 @@
   align-self: center;
   grid-gap: 2px;
   grid-template-columns: repeat(2, 80px);
-  grid-template-rows: 30px 30px 30px 30px 30px;
+  grid-template-rows: auto;
 }
 
 .grid-button {
@@ -107,8 +112,8 @@
 @media (min-width: 640px){
   .grid-grid {
     padding: 0.4em;
-    grid-template-columns: repeat(3, 80px);
-    grid-template-rows: 50px 50px 50px;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: auto;
   }
   .grid-button {
     padding: 0.4em;
@@ -119,7 +124,7 @@
     display: flex;
     flex-direction: column;
     grid-area: left; 
-    overflow: hidden;
+    overflow: auto;
     min-width: 0;
     min-width: 500px;
     max-width: 500px;
@@ -130,16 +135,17 @@
     flex-direction: column;
     grid-area: right;
     overflow: hidden;
+    overflow-y: auto;
     min-width: 0;
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 400px;
+    max-width: 400px;
     background: rgba(56, 60, 62, 0.7);
   }
 
   .grid-grid {
     padding: 0.6em;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: 50px 50px 50px;
+    grid-template-columns: repeat(3, 140px);
+    grid-template-rows: auto;
   }
   .grid-button {
     padding: 0.6em;
