@@ -463,23 +463,38 @@ export default function Home() {
             borderLeft: "2px solid rgba(0,0,0,0.2)",
           }}
         >
-          <h3 style={{ color: "#ffffff", alignSelf: "center" }}>{pipeline}</h3>
-          {pipeline == "ENHANCE" ? (
-            <p>Frame interpolation and image inpainting coming soon!</p>
-          ) : null}
-          {model.enableAnimateLCM ||
-          model.enableAnimateDiff ||
-          model.enableAnimateDiffLightning ? (
-            <p>Try out a few different base models!</p>
-          ) : null}
-          {model.pipeline == "image-to-video" ? (
-            <p>
-              Lightning quick and directable AnimateDiff+SparseCtrl coming soon!
-            </p>
-          ) : null}
-          {model.model == "prompthero/openjourney-v4" ? (
-            <p>This model has not been optimized yet.</p>
-          ) : null}
+          {/* Some help text per pipeline */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <h3 style={{ color: "#ffffff", marginBottom: 0 }}>{pipeline}</h3>
+            {pipeline == "CREATE" ? (
+              <p style={{ margin: 0 }}>Craft images and videos from text.</p>
+            ) : null}
+            {pipeline == "ENHANCE" ? (
+              <p style={{ margin: 0 }}>
+                Process images and videos. Upscaling, interpolation and
+                inpainting coming soon!
+              </p>
+            ) : null}
+            {pipeline == "ANIMATE" ? (
+              <p style={{ margin: 0 }}>
+                Create, extend or restyle videos. Lightning quick and directable
+                AnimateDiff+SparseCtrl coming soon!
+              </p>
+            ) : null}
+            {model.model == "prompthero/openjourney-v4" ? (
+              <p style={{ margin: 0 }}>
+                This model has not been optimized yet.
+              </p>
+            ) : null}
+          </div>
           {/* Model selection */}
           <p style={{ color: "#ffffff", alignSelf: "center" }}>Model</p>
           <div
@@ -592,7 +607,9 @@ export default function Home() {
             </div>
           ) : null}
           {/* Speedup selection */}
-          <p style={{ color: "#ffffff", alignSelf: "center" }}>Speedup Module</p>
+          <p style={{ color: "#ffffff", alignSelf: "center" }}>
+            Speedup Module
+          </p>
           <div
             style={{
               display: "flex",
@@ -779,7 +796,9 @@ export default function Home() {
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
           thisModelInfo?.supportsAnimateDiffLightning ? (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>Animation Module</p>
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>
+              Animation Module
+            </p>
           ) : null}
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
