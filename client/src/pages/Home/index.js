@@ -31,6 +31,10 @@ const models = [
         name: "DreamShaper",
         model: "Lykon/dreamshaper-xl-1-0",
       },
+      {
+        name: "RealisticVision",
+        model: "SG161222/RealVisXL_V4.0",
+      },
     ],
     pipeline: "text-to-image",
     supportsLCM: true,
@@ -641,6 +645,7 @@ export default function Home() {
               }
               style={
                 !thisModelInfo.supportsTurbo ||
+                model.baseModel == "SG161222/RealVisXL_V4.0" ||
                 model.enableAnimateLCM ||
                 model.enableAnimateDiff ||
                 model.enableAnimateDiffLightning
@@ -969,7 +974,7 @@ export default function Home() {
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              marginTop: "0.5em"
+              marginTop: "0.5em",
             }}
           >
             {model.model !=
@@ -993,7 +998,7 @@ export default function Home() {
                     height: "100%",
                     marginLeft: "0.2em",
                     marginRight: "0.2em",
-                    minHeight: "200px"
+                    minHeight: "200px",
                   }}
                   onChange={(e) => handlePromptChange(e.target.value)}
                   onKeyDown={handleKeyDown}

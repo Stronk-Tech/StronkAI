@@ -439,6 +439,9 @@ app.post("/tokenize", (req, res) => {
       if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
         base_model_id = "";
         model_id = "Lykon/dreamshaper-xl-lightning";
+      } else if (base_model_id == "SG161222/RealVisXL_V4.0") {
+        base_model_id = "";
+        model_id = "SG161222/RealVisXL_V4.0_Lightning";
       } else {
         base_model_id = "";
         model_id = "ByteDance/SDXL-Lightning";
@@ -447,6 +450,9 @@ app.post("/tokenize", (req, res) => {
       if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
         base_model_id = "";
         model_id = "Lykon/dreamshaper-xl-1-0";
+      } else if (base_model_id == "SG161222/RealVisXL_V4.0") {
+        base_model_id = "";
+        model_id = "SG161222/RealVisXL_V4.0";
       }
     }
   } else if (animate_module != "") {
