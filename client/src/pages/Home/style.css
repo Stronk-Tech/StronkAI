@@ -1,76 +1,94 @@
-.container {  
-    padding: 0;
-    margin: 0;
-    display: flex;
-    width: 100vw;
-    height: 100%;
-    max-width: 100vw;
-    max-height: 100vh;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .top { 
-    display: flex;
-    flex-direction: column;
-    background: rgba(24, 26, 27, 0.8);
-   }
+.container {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  width: 100vw;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+}
 
-  .bot { 
-    display: flex;
-    flex: 1;
-    flex-direction: row; 
-    overflow: hidden;
-  }
-  
-  .left { 
-    display: flex;
-    flex-direction: column;
-    grid-area: left; 
-    overflow-x: hidden;
-    overflow-y: auto;
-    flex: 1;
-    background: rgba(56, 60, 62, 0.7);
-  }
-  
-  .max-and-center { 
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    min-width: 0;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-  }
-  
-  .right { 
-    display: flex;
-    flex-direction: column;
-    grid-area: right;
-    overflow: hidden;
-    flex: 1;
-    background: rgba(56, 60, 62, 0.7);
-  }
+/* CONTAINERS AND STUFF */
+
+.hodler {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  background: rgba(24, 26, 27, 0.8);
+}
+
+.bot {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  grid-area: left;
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex: 1;
+  background: rgba(56, 60, 62, 0.7);
+}
+
+.max-and-center {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  grid-area: right;
+  overflow: hidden;
+  flex: 1;
+  background: rgba(56, 60, 62, 0.7);
+}
+
+/* NICE BUTTON */
 
 .style-button:hover {
-    background-color: rgba(67, 73, 76, 0.57);
+  background-color: rgba(67, 73, 76, 0.57);
+  cursor: pointer;
 }
 
 .style-button {
-   background-color: rgba(24, 26, 27, 0.77);
-   height: 40px;
-    display: flex;
-    border-radius: 1em;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-    justify-content: center;
+  background-color: rgba(24, 26, 27, 0.77);
+  height: 40px;
+  display: flex;
+  border-radius: 1em;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
 }
 
 .style-button:disabled {
   color: #808e9b;
   background-color: rgba(24, 26, 27, 0.77);
 }
+
+/* AUTO GRID */
 
 .grid {
   display: flex;
@@ -85,7 +103,7 @@
   border-radius: 1em;
   padding: 0.2em;
   background-color: rgb(27, 30, 31);
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   align-self: center;
   grid-gap: 2px;
   grid-template-columns: repeat(2, 80px);
@@ -105,12 +123,14 @@
   align-content: center;
 }
 
-.grid-button:hover  {
+.grid-button:hover {
   background-color: rgba(187, 187, 187, 0.568);
 }
 
+/* NON-MOBILE PROPERTIES */
+
 /* For when there is more screen real estate */
-@media (min-width: 640px){
+@media (min-width: 640px) {
   .grid-grid {
     padding: 0.4em;
     grid-template-columns: repeat(3, 120px);
@@ -120,18 +140,21 @@
     padding: 0.4em;
   }
 }
-@media (min-width: 1024px){
-  .left { 
+@media (min-width: 1024px) {
+  .left {
     display: flex;
     flex-direction: column;
-    grid-area: left; 
+    grid-area: left;
+    grid-area: left;
+    overflow: auto;
+    grid-area: left;
     overflow: auto;
     min-width: 0;
     min-width: 500px;
     max-width: 500px;
     background: rgba(56, 60, 62, 0.7);
   }
-  .right { 
+  .right {
     display: flex;
     flex-direction: column;
     grid-area: right;
@@ -153,11 +176,11 @@
   }
 }
 
-/* Tooltip container */
+/* TOOLTIP  */
 .tooltip {
+  text-decoration: none;
+  text-align: center;
   position: relative;
-  display: inline-block;
-  align-self: center;
 }
 .tooltip p {
   position: relative;
@@ -170,9 +193,9 @@
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 180px;
-  margin-left: -90px;
-  top: 100%;
+  bottom: 100%;
   left: 50%;
+  margin-left: -90px;
   background-color: black;
   color: #fff;
   text-align: center;
@@ -185,15 +208,14 @@
 .tooltip .tooltiptext::after {
   content: " ";
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 50%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: transparent transparent black transparent;
+  border-color: black transparent transparent transparent;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }

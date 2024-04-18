@@ -1,16 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="description" content="">
+    <meta charset="utf-8" />
+    <meta name="description" content="" />
     <title>Stronk-Diffusion</title>
     <script>
+      // Prevent vertical overflow
       const documentHeight = () => {
-      const doc = document.documentElement
-      doc.style.setProperty('--doc-height', `${window.innerHeight}px`)
-      }
-      window.addEventListener("resize", documentHeight)
-      documentHeight()
+        const doc = document.documentElement;
+        doc.style.setProperty("--doc-height", `${window.innerHeight}px`);
+      };
+      window.addEventListener("resize", documentHeight);
+      documentHeight();
+      // Tooltips that follow the mouse nicely
+      var tooltips = document.querySelectorAll(".tooltip span");
+      window.onmousemove = function (e) {
+        if (!tooltips?.length) {
+          return;
+        }
+        var x = e.clientX,
+          y = e.clientY;
+        for (var i = 0; i < tooltips.length; i++) {
+          tooltips[i].style.top = y;
+          tooltips[i].style.left = x;
+        }
+      };
     </script>
   </head>
   <body>

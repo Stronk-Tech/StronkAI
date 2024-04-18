@@ -9,6 +9,15 @@ import Preview from "../../components/Preview";
 import useApi from "../../hooks/Api";
 import Worker from "../../components/Worker";
 import Job from "../../components/Job";
+import ModelSelector from "../../components/Pickers/models";
+import CheckpointSelector from "../../components/Pickers/checkpoints";
+import SpeedupSelector from "../../components/Pickers/speedups";
+import AnimationSelector from "../../components/Pickers/animations";
+import NegativePrompt from "../../components/Inputs/negativeprompt";
+import Prompt from "../../components/Inputs/prompt";
+import MotionSelector from "../../components/Pickers/motions";
+import StyleSelector from "../../components/Pickers/styles";
+import LoraSelector from "../../components/Pickers/loras";
 
 // Load env variable or assume local default host+port for backend
 const HTTP_URL = process.env.REACT_APP_HTTP_URL || "http://127.0.0.1:42069";
@@ -229,8 +238,7 @@ const templates = [
   },
   {
     name: "PixelArt",
-    template:
-      "pixel-art of {prompt} . low-res, blocky, pixels, 8-bit graphics",
+    template: "pixel-art of {prompt} . low-res, blocky, pixels, 8-bit graphics",
     negative_prompt:
       "sloppy, messy, blurry, noisy, highly detailed, ultra textured, photo, realistic",
   },
@@ -512,839 +520,170 @@ export default function Home() {
               </p>
             ) : null}
           </div>
-          {/* Model selection */}
-          <div className="tooltip">
-            <p>Model</p>
-            <span className="tooltiptext">
-              Use SDXL for high quality images. SD1.5 supports text2video!
-            </span>
-          </div>
+          {/* Switch between base models, like SDXL or SD1.5 */}
+          <ModelSelector
+            models={models}
+            model={model}
+            setLoRa={setLoRa}
+            setModel={setModel}
+            forceUpdate={forceUpdate}
+          />
+          {/* Base model checkpoint selection, like RealVisXL or RealisticVision */}
+          <CheckpointSelector
+            thisModelInfo={thisModelInfo}
+            model={model}
+            setLoRa={setLoRa}
+            setModel={setModel}
+            forceUpdate={forceUpdate}
+          />
+          {/* Speedup module selection */}
+          <SpeedupSelector
+            thisModelInfo={thisModelInfo}
+            model={model}
+            setLoRa={setLoRa}
+            setModel={setModel}
+            forceUpdate={forceUpdate}
+          />
+          {/* Animation selection */}
+          <AnimationSelector
+            thisModelInfo={thisModelInfo}
+            model={model}
+            setLoRa={setLoRa}
+            setModel={setModel}
+            forceUpdate={forceUpdate}
+          />
+          {/* Prompt input */}
+          <Prompt
+            model={model}
+            setPrompt={setPrompt}
+            prompt={prompt}
+            handleKeyDown={handleKeyDown}
+          />
+          {/* Negative prompt input */}
+          <NegativePrompt
+            model={model}
+            setNegativePrompt={setNegativePrompt}
+            negative_prompt={negative_prompt}
+            handleKeyDown={handleKeyDown}
+          />
+          {/* AnimateDiff-Lightning supports camera direction */}
+          <MotionSelector
+            motions={motions}
+            motion={motion}
+            model={model}
+            setMotion={setMotion}
+          />
+          {/* Style templates! */}
+          <StyleSelector
+            templates={templates}
+            model={model}
+            templateName={templateName}
+            setTemplate={setTemplate}
+            setTemplateName={setTemplateName}
+            setNegativePrompt={setNegativePrompt}
+          />
+          {/* Processing LoRas */}
+          <LoraSelector
+            thisModelInfo={thisModelInfo}
+            loRa={loRa}
+            setLoRa={setLoRa}
+            model={model}
+          />
+          {/* Submit + preview section */}
           <div
             style={{
               display: "flex",
               width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
+              justifyContent: "space-evenly",
+              height: "100px",
+              marginBottom: "2em",
+              marginTop: "2em",
             }}
           >
-            {models.map((item, idx) =>
-              model.pipeline == item.pipeline ? (
-                <div
-                  key={item.name + "-model-" + idx}
-                  className={
-                    model.model == item.model
-                      ? "style-button border"
-                      : "style-button"
-                  }
-                  style={
-                    item.model == "runwayml/stable-diffusion-v1-5" &&
-                    item.pipeline == "image-to-video"
-                      ? {
-                          backgroundColor: "grey",
-                          cursor: "inherit",
-                          flex: 1,
-                          height: "40px",
-                          alignContent: "center",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          padding: 0,
-                        }
-                      : {
-                          cursor: "pointer",
-                          flex: 1,
-                          padding: 0,
-                          alignContent: "center",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          height: "40px",
-                        }
-                  }
-                  onClick={() => {
-                    if (
-                      item.model == "runwayml/stable-diffusion-v1-5" &&
-                      item.pipeline == "image-to-video"
-                    ) {
-                      return;
-                    }
-                    model.enableLCM = false;
-                    model.enableTurbo = false;
-                    model.enableLightning = false;
-                    model.enableAnimateLCM = false;
-                    model.enableAnimateDiff = false;
-                    model.enableAnimateDiffLightning = false;
-                    model.model = item.model;
-                    model.baseModel = "";
-                    setLoRa("");
-                    setModel(model);
-                    setLoRa("");
-                    // Because the ref doesn't actually change, force rerender
-                    forceUpdate();
-                  }}
-                >
-                  {item.name}
-                </div>
-              ) : null
-            )}
-          </div>
-          {/* Base model selection */}
-          {thisModelInfo?.baseModels?.length ? (
-            <div className="tooltip">
-              <p>Checkpoint</p>
-              <span className="tooltiptext">
-                Checkpoints make it easier to generate high quality images from
-                a simple prompt!
-              </span>
-            </div>
-          ) : null}
-          {thisModelInfo?.baseModels?.length ? (
-            <div className="grid">
-              <div className="grid-grid">
-                {thisModelInfo.baseModels.map((item, idx) => (
-                  <div
-                    key={item.name + "-model-" + idx}
-                    className={
-                      model.baseModel == item.model
-                        ? "style-button border"
-                        : "style-button"
-                    }
+            {(model.pipeline == "video-to-video" && selectedVideo != "") ||
+            ((model.pipeline == "image-to-video" ||
+              model.pipeline == "image-to-image") &&
+              selectedImage != "") ? (
+              <div
+                style={{
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  display: "flex",
+                  flex: 1,
+                }}
+              >
+                {model.pipeline == "video-to-video" ? (
+                  <video
+                    src={HTTP_URL + "/videos/" + selectedPreview}
                     style={{
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      objectFit: "cover",
+                      maxHeight: "100px",
+                      maxWidth: "100px",
+                      aspectRatio: "initial",
                     }}
-                    onClick={() => {
-                      model.baseModel = item.model;
-                      setLoRa("");
-                      setModel(model);
-                      // Because the ref doesn't actually change, force rerender
-                      forceUpdate();
+                  ></video>
+                ) : (
+                  <img
+                    src={HTTP_URL + "/images/" + selectedPreview}
+                    style={{
+                      objectFit: "cover",
+                      maxHeight: "100px",
+                      maxWidth: "100px",
+                      aspectRatio: "initial",
                     }}
-                  >
-                    {item.name}
-                  </div>
-                ))}
+                  ></img>
+                )}
               </div>
-            </div>
-          ) : null}
-          {/* Speedup selection */}
-          {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
-          model.model == "prompthero/openjourney-v4" ? null : (
-            <div className="tooltip">
-              <p>Speedup Module</p>
-              <span className="tooltiptext">
-                Generate images at a lightning quick pace.
-              </span>
-            </div>
-          )}
-          {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
-          model.model == "prompthero/openjourney-v4" ? null : (
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-            >
+            ) : (
               <div
-                className={
-                  !model.enableLCM &&
-                  !model.enableTurbo &&
-                  !model.enableLightning
-                    ? "style-button border"
-                    : "style-button"
-                }
                 style={{
-                  padding: 0,
-                  alignContent: "center",
                   justifyContent: "center",
-                  alignItems: "center",
-                  flex: "1",
-                  height: "40px",
-                }}
-                onClick={() => {
-                  model.enableLCM = false;
-                  model.enableTurbo = false;
-                  model.enableLightning = false;
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                None
-              </div>
-              <div
-                className={
-                  model.enableTurbo ? "style-button border" : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsTurbo ||
-                  model.baseModel == "SG161222/RealVisXL_V4.0" ||
-                  model.enableAnimateLCM ||
-                  model.enableAnimateDiff ||
-                  model.enableAnimateDiffLightning
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (
-                    !thisModelInfo.supportsTurbo ||
-                    model.baseModel == "SG161222/RealVisXL_V4.0" ||
-                    model.enableAnimateLCM ||
-                    model.enableAnimateDiff ||
-                    model.enableAnimateDiffLightning
-                  ) {
-                    return;
-                  }
-                  model.enableLCM = false;
-                  model.enableTurbo = true;
-                  model.enableLightning = false;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                Turbo
-              </div>
-              <div
-                className={
-                  model.enableLightning ? "style-button border" : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsLightning ||
-                  model.enableAnimateLCM ||
-                  model.enableAnimateDiff ||
-                  model.enableAnimateDiffLightning
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (
-                    !thisModelInfo.supportsLightning ||
-                    model.enableAnimateLCM ||
-                    model.enableAnimateDiff ||
-                    model.enableAnimateDiffLightning
-                  ) {
-                    return;
-                  }
-                  model.enableLCM = false;
-                  model.enableTurbo = false;
-                  model.enableLightning = true;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                Lightning
-              </div>
-              <div
-                className={
-                  model.enableLCM ? "style-button border" : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsLCM ||
-                  model.baseModel == "SG161222/RealVisXL_V4.0" ||
-                  model.baseModel == "Lykon/dreamshaper-xl-1-0" ||
-                  model.enableAnimateLCM ||
-                  model.enableAnimateDiff ||
-                  model.enableAnimateDiffLightning
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (
-                    !thisModelInfo.supportsLCM ||
-                    model.enableAnimateLCM ||
-                    model.enableAnimateDiff ||
-                    model.enableAnimateDiffLightning ||
-                    model.baseModel == "SG161222/RealVisXL_V4.0" ||
-                    model.baseModel == "Lykon/dreamshaper-xl-1-0"
-                  ) {
-                    return;
-                  }
-                  model.enableLCM = true;
-                  model.enableTurbo = false;
-                  model.enableLightning = false;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                LCM
-              </div>
-            </div>
-          )}
-          {/* Animation selection */}
-          {thisModelInfo?.supportsAnimateLCM ||
-          thisModelInfo?.supportsAnimateDiff ||
-          thisModelInfo?.supportsAnimateDiffLightning ? (
-            <div className="tooltip">
-              <p>Animation Module</p>
-              <span className="tooltiptext">
-                Immediately go from text to video!
-              </span>
-            </div>
-          ) : null}
-          {thisModelInfo?.supportsAnimateLCM ||
-          thisModelInfo?.supportsAnimateDiff ||
-          thisModelInfo?.supportsAnimateDiffLightning ? (
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-            >
-              <div
-                className={
-                  !model.enableAnimateLCM &&
-                  !model.enableAnimateDiff &&
-                  !model.enableAnimateDiffLightning
-                    ? "style-button border"
-                    : "style-button"
-                }
-                style={{
-                  padding: 0,
                   alignContent: "center",
-                  justifyContent: "center",
                   alignItems: "center",
-                  flex: "1",
-                  height: "40px",
-                }}
-                onClick={() => {
-                  model.enableAnimateLCM = false;
-                  model.enableAnimateDiff = false;
-                  model.enableAnimateDiffLightning = false;
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                None
-              </div>
-              <div
-                className={
-                  model.enableAnimateDiff
-                    ? "style-button border"
-                    : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsAnimateDiff
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (!thisModelInfo.supportsAnimateDiff) {
-                    return;
-                  }
-                  model.enableLCM = false;
-                  model.enableTurbo = false;
-                  model.enableLightning = false;
-                  model.enableAnimateLCM = false;
-                  model.enableAnimateDiff = true;
-                  model.enableAnimateDiffLightning = false;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                AnimateDiff
-              </div>
-              <div
-                className={
-                  model.enableAnimateDiffLightning
-                    ? "style-button border"
-                    : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsAnimateDiffLightning
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (!thisModelInfo.supportsAnimateDiffLightning) {
-                    return;
-                  }
-                  model.enableLCM = false;
-                  model.enableTurbo = false;
-                  model.enableLightning = false;
-                  model.enableAnimateLCM = false;
-                  model.enableAnimateDiff = false;
-                  model.enableAnimateDiffLightning = true;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                Lightning
-              </div>
-              <div
-                className={
-                  model.enableAnimateLCM
-                    ? "style-button border"
-                    : "style-button"
-                }
-                style={
-                  !thisModelInfo.supportsAnimateLCM
-                    ? {
-                        backgroundColor: "grey",
-                        cursor: "inherit",
-                        flex: 1,
-                        height: "100%",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: 0,
-                      }
-                    : {
-                        cursor: "pointer",
-                        flex: 1,
-                        height: "100%",
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "40px",
-                      }
-                }
-                onClick={() => {
-                  if (!thisModelInfo.supportsAnimateLCM) {
-                    return;
-                  }
-                  model.enableLCM = false;
-                  model.enableTurbo = false;
-                  model.enableLightning = false;
-                  model.enableAnimateLCM = true;
-                  model.enableAnimateDiff = false;
-                  model.enableAnimateDiffLightning = false;
-                  setLoRa("");
-                  setModel(model);
-                  // Because the ref doesn't actually change, force rerender
-                  forceUpdate();
-                }}
-              >
-                AnimateLCM
-              </div>
-            </div>
-          ) : null}
-          {/* Prompt input */}
-          <div
-            style={{
-              display: "flex",
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              marginTop: "0.5em",
-            }}
-          >
-            {model.model !=
-            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div className="tooltip">
-                <p>Prompt</p>
-                <span className="tooltiptext">
-                  Be descriptive! Try to describe the scene, weather, lighting, colours, etc.
-                </span>
-              </div>
-            ) : null}
-            {model.model !=
-            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
                   display: "flex",
                   flex: 1,
-                  justifyContent: "stretch",
-                  alignItems: "stretch",
-                  maxHeight: "400px",
                 }}
               >
-                <textarea
-                  value={prompt}
-                  placeholder={"Prompt"}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    marginLeft: "0.2em",
-                    marginRight: "0.2em",
-                    minHeight: "200px",
-                  }}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
+                {message}
               </div>
-            ) : null}
-            {/* Negative prompt input */}
-            {model.model !=
-            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div className="tooltip">
-                <p>Negative prompt</p>
-                <span className="tooltiptext">
-                  Don't over-do it! Especially when using a checkpoint or LoRa.
-                </span>
-              </div>
-            ) : null}
-            {model.model !=
-            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  flex: 1,
-                  justifyContent: "stretch",
-                  alignItems: "stretch",
-                  maxHeight: "400px",
-                }}
-              >
-                <textarea
-                  value={negative_prompt}
-                  placeholder={"Negative Prompt"}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    marginLeft: "0.2em",
-                    marginRight: "0.2em",
-                    minHeight: "100px",
-                  }}
-                  onChange={(e) => setNegativePrompt(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />{" "}
-              </div>
-            ) : null}
-            {/* AnimateDiff-Lightning supports camera direction */}
-            {model.enableAnimateDiffLightning ? (
-              <div className="tooltip">
-                <p>Motion</p>
-                <span className="tooltiptext">Control camera movement.</span>
-              </div>
-            ) : null}
-            {model.enableAnimateDiffLightning ? (
-              <div className="grid">
-                <div className="grid-grid">
-                  {motions.map((item, idx) => (
-                    <div
-                      key={item.name + "-motion-" + idx}
-                      className={
-                        motion == item.motion
-                          ? "style-button border"
-                          : "style-button"
-                      }
-                      style={{
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                      onClick={() => {
-                        setMotion(item.motion);
-                      }}
-                    >
-                      {item.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            {/* Disclaimer for sucky img2img model */}
-            {model.model != "timbrooks/instruct-pix2pix" &&
-            model.model !=
-              "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div className="tooltip">
-                <p>Prompt style template</p>
-                <span className="tooltiptext">
-                  Applies a template to your prompt to recreate a specific style.
-                </span>
-              </div>
-            ) : null}
-            {/* Style templates! */}
-            {model.model != "timbrooks/instruct-pix2pix" &&
-            model.model !=
-              "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <div className="grid">
-                <div className="grid-grid">
-                  {templates.map((item, idx) => (
-                    <div
-                      key={item.name + "-template-" + idx}
-                      className={
-                        templateName == item.name
-                          ? "style-button border"
-                          : "style-button"
-                      }
-                      style={{
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                      onClick={() => {
-                        setTemplate(item.template);
-                        setTemplateName(item.name);
-                        setNegativePrompt(item.negative_prompt);
-                      }}
-                    >
-                      {item.name == "Style" ? "None" : item.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            {/* Processing LoRas */}
-            {thisModelInfo.loRas.length &&
-            model.baseModel == "" &&
-            !model.enableLCM &&
-            !model.enableTurbo &&
-            !model.enableLightning &&
-            !model.enableAnimateLCM &&
-            !model.enableAnimateDiff &&
-            !model.enableAnimateDiffLightning ? (
-              <div className="tooltip">
-                <p>LoRas</p>
-                <span className="tooltiptext">
-                  Enhance or restyle the output completely.
-                </span>
-              </div>
-            ) : null}
-            {thisModelInfo.loRas.length &&
-            model.baseModel == "" &&
-            !model.enableLCM &&
-            !model.enableTurbo &&
-            !model.enableLightning &&
-            !model.enableAnimateLCM &&
-            !model.enableAnimateDiff &&
-            !model.enableAnimateDiffLightning ? (
-              <div className="grid">
-                <div className="grid-grid">
-                  {thisModelInfo.loRas.map((item, idx) => (
-                    <div
-                      key={item.name + "-lora-" + idx}
-                      className={
-                        loRa == item.model
-                          ? "style-button border"
-                          : "style-button"
-                      }
-                      style={{
-                        padding: 0,
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                      onClick={() => {
-                        setLoRa(item.model);
-                      }}
-                    >
-                      {item.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            {/* Some padding between the submit section */}
+            )}
             <div
               style={{
-                color: "#ffffff",
-                alignSelf: "center",
-                width: "100%",
-                height: "0.5em",
-                marginBottom: "0.5em",
-                borderBottom: "1px solid rgba(56, 60, 62, 0.7)",
-                height: "100%",
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                display: "flex",
+                marginLeft: "1em",
+                marginRight: "1em",
                 flex: 1,
               }}
-            />
-            {/* Submit + preview section */}
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "space-evenly",
-                height: "50px",
-                marginBottom: "1em",
-              }}
             >
-              {(model.pipeline == "video-to-video" && selectedVideo != "") ||
-              ((model.pipeline == "image-to-video" ||
-                model.pipeline == "image-to-image") &&
-                selectedImage != "") ? (
-                <div
-                  style={{
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                    display: "flex",
-                    flex: 1,
-                  }}
-                >
-                  {model.pipeline == "video-to-video" ? (
-                    <video
-                      src={HTTP_URL + "/videos/" + selectedPreview}
-                      style={{
-                        objectFit: "cover",
-                        maxHeight: "70px",
-                        maxWidth: "70px",
-                        aspectRatio: "initial",
-                      }}
-                    ></video>
-                  ) : (
-                    <img
-                      src={HTTP_URL + "/images/" + selectedPreview}
-                      style={{
-                        objectFit: "cover",
-                        maxHeight: "70px",
-                        maxWidth: "70px",
-                        aspectRatio: "initial",
-                      }}
-                    ></img>
-                  )}
-                </div>
-              ) : (
-                <div
-                  style={{
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                    display: "flex",
-                    flex: 1,
-                  }}
-                >
-                  {message}
-                </div>
-              )}
               <div
-                style={{
-                  justifyContent: "center",
-                  alignContent: "center",
-                  alignItems: "center",
-                  display: "flex",
-                  marginLeft: "1em",
-                  marginRight: "1em",
-                  flex: 1,
-                }}
+                className="grid-button"
+                style={
+                  disabled
+                    ? {
+                        backgroundColor: "grey",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        height: "100px",
+                        width: "200px",
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        padding: 0,
+                        height: "100px",
+                        width: "200px",
+                        border: "3px solid rgba(56, 109, 164, 0.82)",
+                      }
+                }
+                disabled={disabled}
+                onClick={() => handleSubmit()}
               >
-                <div
-                  className="grid-button"
-                  style={
-                    disabled
-                      ? {
-                          backgroundColor: "grey",
-                          flex: 1,
-                          height: "100%",
-                          padding: 0,
-                        }
-                      : {
-                          cursor: "pointer",
-                          flex: 1,
-                          height: "100%",
-                          padding: 0,
-                          border: "3px solid rgba(56, 109, 164, 0.82)",
-                        }
-                  }
-                  disabled={disabled}
-                  onClick={() => handleSubmit()}
-                >
-                  Submit
-                </div>
+                Submit
               </div>
             </div>
           </div>
