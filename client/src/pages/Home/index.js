@@ -675,6 +675,7 @@ export default function Home() {
                 onClick={() => {
                   if (
                     !thisModelInfo.supportsTurbo ||
+                    model.baseModel == "SG161222/RealVisXL_V4.0" ||
                     model.enableAnimateLCM ||
                     model.enableAnimateDiff ||
                     model.enableAnimateDiffLightning
@@ -746,6 +747,8 @@ export default function Home() {
                 }
                 style={
                   !thisModelInfo.supportsLCM ||
+                  model.baseModel == "SG161222/RealVisXL_V4.0" ||
+                  model.baseModel == "Lykon/dreamshaper-xl-1-0" ||
                   model.enableAnimateLCM ||
                   model.enableAnimateDiff ||
                   model.enableAnimateDiffLightning
@@ -775,7 +778,9 @@ export default function Home() {
                     !thisModelInfo.supportsLCM ||
                     model.enableAnimateLCM ||
                     model.enableAnimateDiff ||
-                    model.enableAnimateDiffLightning
+                    model.enableAnimateDiffLightning ||
+                    model.baseModel == "SG161222/RealVisXL_V4.0" ||
+                    model.baseModel == "Lykon/dreamshaper-xl-1-0"
                   ) {
                     return;
                   }

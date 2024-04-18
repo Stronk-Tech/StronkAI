@@ -452,10 +452,17 @@ app.post("/tokenize", (req, res) => {
         base_model_id = "";
         model_id = "ByteDance/SDXL-Lightning";
       }
-    } else if (base_model_id != "") {
-      // Request all SDXL as dedicated model
+    } else if (speedup_module == "LCM") {
+      if (base_model_id == "") {
+        base_model_id == "stabilityai/stable-diffusion-xl-base-1.0";
+        model_id = "latent-consistency/lcm-lora-sdxl";
+      }else{
+        // Thus all SDXL models load as their own dedicated model
+        model_id = base_model_id;
+      }
+    }else{
+      // Thus all SDXL models load as their own dedicated model
       model_id = base_model_id;
-      base_model_id = "";
     }
   } else if (animate_module != "") {
     if (base_model_id == "") {
@@ -467,6 +474,13 @@ app.post("/tokenize", (req, res) => {
       model_id = "ByteDance/AnimateDiff";
     } else if (animate_module == "AnimateDiffLightning") {
       model_id = "ByteDance/AnimateDiff-Lightning";
+    }
+  } else {
+    if (speedup_module == "LCM") {
+      if (base_model_id == "") {
+        base_model_id == "runwayml/stable-diffusion-v1-5";
+      }
+      model_id = "latent-consistency/lcm-lora-sdv1-5";
     }
   }
   if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
