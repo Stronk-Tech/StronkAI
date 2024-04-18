@@ -493,11 +493,6 @@ export default function Home() {
                 AnimateDiff+SparseCtrl coming soon!
               </p>
             ) : null}
-            {model.model == "prompthero/openjourney-v4" ? (
-              <p style={{ margin: 0 }}>
-                This model has not been optimized yet.
-              </p>
-            ) : null}
           </div>
           {/* Model selection */}
           <p style={{ color: "#ffffff", alignSelf: "center" }}>Model</p>
@@ -569,7 +564,7 @@ export default function Home() {
           </div>
           {/* Base model selection */}
           {thisModelInfo?.baseModels?.length ? (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>Base Model</p>
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>Checkpoint</p>
           ) : null}
           {thisModelInfo?.baseModels?.length ? (
             <div className="grid">
@@ -602,192 +597,200 @@ export default function Home() {
             </div>
           ) : null}
           {/* Speedup selection */}
-          <p style={{ color: "#ffffff", alignSelf: "center" }}>
-            Speedup Module
-          </p>
-          <div
-            style={{
-              display: "flex",
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
+          {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
+          model.model == "prompthero/openjourney-v4" ? null : (
+            <p style={{ color: "#ffffff", alignSelf: "center" }}>
+              Speedup Module
+            </p>
+          )}
+          {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
+          model.model == "prompthero/openjourney-v4" ? null : (
             <div
-              className={
-                !model.enableLCM && !model.enableTurbo && !model.enableLightning
-                  ? "style-button border"
-                  : "style-button"
-              }
               style={{
-                padding: 0,
-                alignContent: "center",
+                display: "flex",
+                width: "100%",
                 justifyContent: "center",
                 alignItems: "center",
-                flex: "1",
-                height: "40px",
-              }}
-              onClick={() => {
-                model.enableLCM = false;
-                model.enableTurbo = false;
-                model.enableLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
+                flexDirection: "row",
               }}
             >
-              None
-            </div>
-            <div
-              className={
-                model.enableTurbo ? "style-button border" : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsTurbo ||
-                model.baseModel == "SG161222/RealVisXL_V4.0" ||
-                model.enableAnimateLCM ||
-                model.enableAnimateDiff ||
-                model.enableAnimateDiffLightning
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (
+              <div
+                className={
+                  !model.enableLCM &&
+                  !model.enableTurbo &&
+                  !model.enableLightning
+                    ? "style-button border"
+                    : "style-button"
+                }
+                style={{
+                  padding: 0,
+                  alignContent: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: "1",
+                  height: "40px",
+                }}
+                onClick={() => {
+                  model.enableLCM = false;
+                  model.enableTurbo = false;
+                  model.enableLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                None
+              </div>
+              <div
+                className={
+                  model.enableTurbo ? "style-button border" : "style-button"
+                }
+                style={
                   !thisModelInfo.supportsTurbo ||
+                  model.baseModel == "SG161222/RealVisXL_V4.0" ||
                   model.enableAnimateLCM ||
                   model.enableAnimateDiff ||
                   model.enableAnimateDiffLightning
-                ) {
-                  return;
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
                 }
-                model.enableLCM = false;
-                model.enableTurbo = true;
-                model.enableLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              Turbo
-            </div>
-            <div
-              className={
-                model.enableLightning ? "style-button border" : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsLightning ||
-                model.enableAnimateLCM ||
-                model.enableAnimateDiff ||
-                model.enableAnimateDiffLightning
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (
+                onClick={() => {
+                  if (
+                    !thisModelInfo.supportsTurbo ||
+                    model.enableAnimateLCM ||
+                    model.enableAnimateDiff ||
+                    model.enableAnimateDiffLightning
+                  ) {
+                    return;
+                  }
+                  model.enableLCM = false;
+                  model.enableTurbo = true;
+                  model.enableLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                Turbo
+              </div>
+              <div
+                className={
+                  model.enableLightning ? "style-button border" : "style-button"
+                }
+                style={
                   !thisModelInfo.supportsLightning ||
                   model.enableAnimateLCM ||
                   model.enableAnimateDiff ||
                   model.enableAnimateDiffLightning
-                ) {
-                  return;
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
                 }
-                model.enableLCM = false;
-                model.enableTurbo = false;
-                model.enableLightning = true;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              Lightning
-            </div>
-            <div
-              className={
-                model.enableLCM ? "style-button border" : "style-button"
-              }
-              style={
-                !thisModelInfo.supportsLCM ||
-                model.enableAnimateLCM ||
-                model.enableAnimateDiff ||
-                model.enableAnimateDiffLightning
-                  ? {
-                      backgroundColor: "grey",
-                      cursor: "inherit",
-                      flex: 1,
-                      height: "100%",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: 0,
-                    }
-                  : {
-                      cursor: "pointer",
-                      flex: 1,
-                      height: "100%",
-                      padding: 0,
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "40px",
-                    }
-              }
-              onClick={() => {
-                if (
+                onClick={() => {
+                  if (
+                    !thisModelInfo.supportsLightning ||
+                    model.enableAnimateLCM ||
+                    model.enableAnimateDiff ||
+                    model.enableAnimateDiffLightning
+                  ) {
+                    return;
+                  }
+                  model.enableLCM = false;
+                  model.enableTurbo = false;
+                  model.enableLightning = true;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                Lightning
+              </div>
+              <div
+                className={
+                  model.enableLCM ? "style-button border" : "style-button"
+                }
+                style={
                   !thisModelInfo.supportsLCM ||
                   model.enableAnimateLCM ||
                   model.enableAnimateDiff ||
                   model.enableAnimateDiffLightning
-                ) {
-                  return;
+                    ? {
+                        backgroundColor: "grey",
+                        cursor: "inherit",
+                        flex: 1,
+                        height: "100%",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 0,
+                      }
+                    : {
+                        cursor: "pointer",
+                        flex: 1,
+                        height: "100%",
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "40px",
+                      }
                 }
-                model.enableLCM = true;
-                model.enableTurbo = false;
-                model.enableLightning = false;
-                setModel(model);
-                // Because the ref doesn't actually change, force rerender
-                forceUpdate();
-              }}
-            >
-              LCM
+                onClick={() => {
+                  if (
+                    !thisModelInfo.supportsLCM ||
+                    model.enableAnimateLCM ||
+                    model.enableAnimateDiff ||
+                    model.enableAnimateDiffLightning
+                  ) {
+                    return;
+                  }
+                  model.enableLCM = true;
+                  model.enableTurbo = false;
+                  model.enableLightning = false;
+                  setModel(model);
+                  // Because the ref doesn't actually change, force rerender
+                  forceUpdate();
+                }}
+              >
+                LCM
+              </div>
             </div>
-          </div>
+          )}
           {/* Animation selection */}
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||

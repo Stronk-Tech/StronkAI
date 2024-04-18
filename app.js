@@ -416,7 +416,13 @@ app.post("/tokenize", (req, res) => {
     if (model_id == "stabilityai/stable-diffusion-xl-base-1.0") {
       width = 1024;
       height = 1024;
+    } else if (model_id == "chillpixel/starlight-animated-sdxl") {
+      width = 1024;
+      height = 1024;
     } else if (model_id == "runwayml/stable-diffusion-v1-5") {
+      width = 768;
+      height = 768;
+    } else if (model_id == "prompthero/openjourney-v4") {
       width = 768;
       height = 768;
     }
@@ -446,14 +452,10 @@ app.post("/tokenize", (req, res) => {
         base_model_id = "";
         model_id = "ByteDance/SDXL-Lightning";
       }
-    } else {
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
-        base_model_id = "";
-        model_id = "Lykon/dreamshaper-xl-1-0";
-      } else if (base_model_id == "SG161222/RealVisXL_V4.0") {
-        base_model_id = "";
-        model_id = "SG161222/RealVisXL_V4.0";
-      }
+    } else if (base_model_id != "") {
+      // Request all SDXL as dedicated model
+      model_id = base_model_id;
+      base_model_id = "";
     }
   } else if (animate_module != "") {
     if (base_model_id == "") {
@@ -466,11 +468,6 @@ app.post("/tokenize", (req, res) => {
     } else if (animate_module == "AnimateDiffLightning") {
       model_id = "ByteDance/AnimateDiff-Lightning";
     }
-  } else if (base_model_id != "") {
-    // Since we don't support hot-swapping base models at the moment
-    // request it as a dedicated model in the pipeline, which is supported.
-    // model_id = base_model_id;
-    // base_model_id = "";
   }
   if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
     if (speedup_module == "LCM") {
