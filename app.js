@@ -459,13 +459,13 @@ app.post("/tokenize", (req, res) => {
       if (base_model_id == "") {
         base_model_id == "stabilityai/stable-diffusion-xl-base-1.0";
         model_id = "latent-consistency/lcm-lora-sdxl";
-      }else{
+      } else {
         // Thus all SDXL models load as their own dedicated model
         model_id = base_model_id;
       }
-    }else{
+    } else {
       // Thus all SDXL models load as their own dedicated model
-      if (base_model_id != ""){
+      if (base_model_id != "") {
         model_id = base_model_id;
       }
     }
@@ -480,18 +480,17 @@ app.post("/tokenize", (req, res) => {
     } else if (animate_module == "AnimateDiffLightning") {
       model_id = "ByteDance/AnimateDiff-Lightning";
     }
+  } else if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
+    if (speedup_module == "LCM") {
+      model_id = "wangfuyun/AnimateLCM-SVD-xt";
+      base_model_id = "";
+    }
   } else {
     if (speedup_module == "LCM") {
       if (base_model_id == "") {
         base_model_id == "runwayml/stable-diffusion-v1-5";
       }
       model_id = "latent-consistency/lcm-lora-sdv1-5";
-    }
-  }
-  if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
-    if (speedup_module == "LCM") {
-      model_id = "wangfuyun/AnimateLCM-SVD-xt";
-      base_model_id = "";
     }
   }
 
