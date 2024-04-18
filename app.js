@@ -272,6 +272,7 @@ const mint = (workerIdx, job) => {
       width: job.width,
       height: job.height,
       motion: job.motion,
+      lora: job.lora,
       speedup_module: job.speedup_module,
       animate_module: job.animate_module,
     };
@@ -320,6 +321,7 @@ const mint = (workerIdx, job) => {
       width: job.width,
       height: job.height,
       motion: job.motion,
+      lora: job.lora,
       speedup_module: job.speedup_module,
       animate_module: job.animate_module,
     });
@@ -383,6 +385,7 @@ app.post("/tokenize", (req, res) => {
   const prompt = req.body.prompt || "";
   const negative_prompt = req.body.negative_prompt || "";
   const motion = req.body.motion || "";
+  const lora = req.body.lora || "";
   const image = req.body.image;
   let model_id = req.body.model;
   let base_model_id = req.body.baseModel || "";
@@ -462,7 +465,9 @@ app.post("/tokenize", (req, res) => {
       }
     }else{
       // Thus all SDXL models load as their own dedicated model
-      model_id = base_model_id;
+      if (base_model_id != ""){
+        model_id = base_model_id;
+      }
     }
   } else if (animate_module != "") {
     if (base_model_id == "") {
@@ -500,6 +505,7 @@ app.post("/tokenize", (req, res) => {
       prompt: prompt,
       negative_prompt: negative_prompt,
       motion: motion,
+      lora: lora,
       model_id: model_id,
       base_model_id: base_model_id,
       source: imagePath + "/" + image,
@@ -529,6 +535,7 @@ app.post("/tokenize", (req, res) => {
       prompt: prompt,
       negative_prompt: negative_prompt,
       motion: motion,
+      lora: lora,
       model_id: model_id,
       base_model_id: base_model_id,
       source: videoPath + "/" + image,
@@ -553,6 +560,7 @@ app.post("/tokenize", (req, res) => {
       prompt: prompt,
       negative_prompt: negative_prompt,
       motion: motion,
+      lora: lora,
       model_id: model_id,
       base_model_id: base_model_id,
       source: null,

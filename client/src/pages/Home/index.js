@@ -36,6 +36,16 @@ const models = [
         model: "SG161222/RealVisXL_V4.0",
       },
     ],
+    loRas: [
+      {
+        name: "None",
+        model: "",
+      },
+      {
+        name: "PixelArt",
+        model: "nerijs/pixel-art-xl",
+      },
+    ],
     pipeline: "text-to-image",
     supportsLCM: true,
     supportsTurbo: true,
@@ -69,6 +79,7 @@ const models = [
         model: "SG161222/Realistic_Vision_V6.0_B1_noVAE",
       },
     ],
+    loRas: [],
     pipeline: "text-to-image",
     supportsLCM: true,
     supportsTurbo: false,
@@ -81,6 +92,7 @@ const models = [
     name: "Openjourney",
     model: "prompthero/openjourney-v4",
     baseModels: [],
+    loRas: [],
     pipeline: "text-to-image",
     supportsLCM: false,
     supportsTurbo: false,
@@ -94,6 +106,7 @@ const models = [
     name: "SDXL",
     model: "stabilityai/stable-diffusion-xl-base-1.0",
     baseModels: [],
+    loRas: [],
     pipeline: "image-to-image",
     supportsLCM: true,
     supportsTurbo: false,
@@ -106,6 +119,7 @@ const models = [
     name: "pix2pix",
     model: "timbrooks/instruct-pix2pix",
     baseModels: [],
+    loRas: [],
     pipeline: "image-to-image",
     supportsLCM: false,
     supportsTurbo: false,
@@ -119,6 +133,7 @@ const models = [
     name: "SVD",
     model: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
     baseModels: [],
+    loRas: [],
     pipeline: "image-to-video",
     supportsLCM: true,
     supportsTurbo: false,
@@ -148,6 +163,7 @@ const models = [
         model: "SG161222/Realistic_Vision_V6.0_B1_noVAE",
       },
     ],
+    loRas: [],
     pipeline: "image-to-video",
     supportsLCM: true,
     supportsTurbo: false,
@@ -284,6 +300,8 @@ export default function Home() {
   const [negative_prompt, setNegativePrompt] = useState("");
   // Motion LoRa to request from the AI worker
   const [motion, setMotion] = useState("");
+  // Style LoRa to request from the AI worker
+  const [loRa, setLoRa] = useState("");
   // Template/style name to display and pattern to apply on the prompt
   const [template, setTemplate] = useState("{prompt}");
   const [templateName, setTemplateName] = useState("None");
@@ -323,6 +341,7 @@ export default function Home() {
         enableAnimateDiffLightning: false,
       });
       setMotion("");
+      setLoRa("");
     }
     if (newVal == "ENHANCE") {
       setModel({
@@ -338,6 +357,7 @@ export default function Home() {
         enableAnimateDiffLightning: false,
       });
       setMotion("");
+      setLoRa("");
     }
     if (newVal == "ANIMATE") {
       setModel({
@@ -353,6 +373,7 @@ export default function Home() {
         enableAnimateDiffLightning: false,
       });
       setMotion("");
+      setLoRa("");
     }
     setPipeline(newVal);
   }
@@ -392,6 +413,7 @@ export default function Home() {
         prompt: replaceMe(template, { prompt: prompt }),
         negative_prompt: negative_prompt,
         motion: motion,
+        lora: loRa,
         image: pipeline == "video-to-video" ? selectedVideo : selectedImage,
         model: model.model,
         baseModel: model.baseModel,
@@ -548,7 +570,9 @@ export default function Home() {
                     model.enableAnimateDiffLightning = false;
                     model.model = item.model;
                     model.baseModel = "";
+                    setLoRa("");
                     setModel(model);
+                    setLoRa("");
                     // Because the ref doesn't actually change, force rerender
                     forceUpdate();
                   }}
@@ -581,6 +605,7 @@ export default function Home() {
                     }}
                     onClick={() => {
                       model.baseModel = item.model;
+                      setLoRa("");
                       setModel(model);
                       // Because the ref doesn't actually change, force rerender
                       forceUpdate();
@@ -681,6 +706,7 @@ export default function Home() {
                   model.enableLCM = false;
                   model.enableTurbo = true;
                   model.enableLightning = false;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -730,6 +756,7 @@ export default function Home() {
                   model.enableLCM = false;
                   model.enableTurbo = false;
                   model.enableLightning = true;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -783,6 +810,7 @@ export default function Home() {
                   model.enableLCM = true;
                   model.enableTurbo = false;
                   model.enableLightning = false;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -878,6 +906,7 @@ export default function Home() {
                   model.enableAnimateLCM = false;
                   model.enableAnimateDiff = true;
                   model.enableAnimateDiffLightning = false;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -924,6 +953,7 @@ export default function Home() {
                   model.enableAnimateLCM = false;
                   model.enableAnimateDiff = false;
                   model.enableAnimateDiffLightning = true;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -970,6 +1000,7 @@ export default function Home() {
                   model.enableAnimateLCM = true;
                   model.enableAnimateDiff = false;
                   model.enableAnimateDiffLightning = false;
+                  setLoRa("");
                   setModel(model);
                   // Because the ref doesn't actually change, force rerender
                   forceUpdate();
@@ -1092,7 +1123,9 @@ export default function Home() {
             {model.model != "timbrooks/instruct-pix2pix" &&
             model.model !=
               "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>Style</p>
+              <p style={{ color: "#ffffff", alignSelf: "center" }}>
+                Prompt style template
+              </p>
             ) : null}
             {/* Style templates! */}
             {model.model != "timbrooks/instruct-pix2pix" &&
@@ -1121,6 +1154,51 @@ export default function Home() {
                       }}
                     >
                       {item.name == "Style" ? "None" : item.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {/* Processing LoRas */}
+            {thisModelInfo.loRas.length &&
+            model.baseModel == "" &&
+            !model.enableLCM &&
+            !model.enableTurbo &&
+            !model.enableLightning &&
+            !model.enableAnimateLCM &&
+            !model.enableAnimateDiff &&
+            !model.enableAnimateDiffLightning ? (
+              <p style={{ color: "#ffffff", alignSelf: "center" }}>LoRas</p>
+            ) : null}
+            {thisModelInfo.loRas.length &&
+            model.baseModel == "" &&
+            !model.enableLCM &&
+            !model.enableTurbo &&
+            !model.enableLightning &&
+            !model.enableAnimateLCM &&
+            !model.enableAnimateDiff &&
+            !model.enableAnimateDiffLightning ? (
+              <div className="grid">
+                <div className="grid-grid">
+                  {thisModelInfo.loRas.map((item, idx) => (
+                    <div
+                      key={item.name + "-lora-" + idx}
+                      className={
+                        loRa == item.model
+                          ? "style-button border"
+                          : "style-button"
+                      }
+                      style={{
+                        padding: 0,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                      onClick={() => {
+                        setLoRa(item.model);
+                      }}
+                    >
+                      {item.name}
                     </div>
                   ))}
                 </div>
@@ -1252,6 +1330,7 @@ export default function Home() {
             style={{
               display: "flex",
               flex: 1,
+              width: "100%",
               justifyContent: "center",
               alignItems: "center",
             }}
