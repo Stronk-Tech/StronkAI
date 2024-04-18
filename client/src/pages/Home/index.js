@@ -184,7 +184,7 @@ const templates = [
   {
     name: "Animal",
     template:
-      "{prompt}, wildlife photography, photograph, high quality, wildlife, f 1.8, soft focus, 8k, national geographic, award - winning photograph by nick nichols",
+      "{prompt}, wildlife photography, photograph, high quality, wildlife, f 1.8, soft focus, 8k, national geographic",
     negative_prompt:
       "photo, deformed, black and white, realism, disfigured, low contrast",
   },
@@ -217,7 +217,7 @@ const templates = [
   {
     name: "Landscape",
     template:
-      "{prompt}, close shot 35 mm, realism, octane render, 8k, exploration, cinematic, artstation, 35 mm camera, unreal engine, hyper detailed, photo - realistic maximum detail, volumetric light, moody cinematic epic concept art, realistic matte painting, hyper photorealistic, epic, artstation, movie concept art, cinematic composition, ultra - detailed, realistic",
+      "{prompt}, realism, octane render, 8k, exploration, cinematic, artstation, 35 mm camera, unreal engine, hyper detailed, photo - realistic maximum detail, volumetric light, moody cinematic epic concept art, realistic matte painting, hyper photorealistic, epic, artstation, movie concept art, cinematic composition, ultra - detailed, realistic",
     negative_prompt: "",
   },
   {
@@ -230,7 +230,7 @@ const templates = [
   {
     name: "PixelArt",
     template:
-      "pixel-art of {prompt} . low-res, blocky, pixel art style, 8-bit graphics",
+      "pixel-art of {prompt} . low-res, blocky, pixels, 8-bit graphics",
     negative_prompt:
       "sloppy, messy, blurry, noisy, highly detailed, ultra textured, photo, realistic",
   },
@@ -513,7 +513,12 @@ export default function Home() {
             ) : null}
           </div>
           {/* Model selection */}
-          <p style={{ color: "#ffffff", alignSelf: "center" }}>Model</p>
+          <div className="tooltip">
+            <p>Model</p>
+            <span className="tooltiptext">
+              Use SDXL for high quality images. SD1.5 supports text2video!
+            </span>
+          </div>
           <div
             style={{
               display: "flex",
@@ -584,7 +589,13 @@ export default function Home() {
           </div>
           {/* Base model selection */}
           {thisModelInfo?.baseModels?.length ? (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>Checkpoint</p>
+            <div className="tooltip">
+              <p>Checkpoint</p>
+              <span className="tooltiptext">
+                Checkpoints make it easier to generate high quality images from
+                a simple prompt!
+              </span>
+            </div>
           ) : null}
           {thisModelInfo?.baseModels?.length ? (
             <div className="grid">
@@ -620,9 +631,12 @@ export default function Home() {
           {/* Speedup selection */}
           {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
           model.model == "prompthero/openjourney-v4" ? null : (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>
-              Speedup Module
-            </p>
+            <div className="tooltip">
+              <p>Speedup Module</p>
+              <span className="tooltiptext">
+                Generate images at a lightning quick pace.
+              </span>
+            </div>
           )}
           {model.baseModel == "chillpixel/starlight-animated-sdxl" ||
           model.model == "prompthero/openjourney-v4" ? null : (
@@ -824,9 +838,12 @@ export default function Home() {
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
           thisModelInfo?.supportsAnimateDiffLightning ? (
-            <p style={{ color: "#ffffff", alignSelf: "center" }}>
-              Animation Module
-            </p>
+            <div className="tooltip">
+              <p>Animation Module</p>
+              <span className="tooltiptext">
+                Immediately go from text to video!
+              </span>
+            </div>
           ) : null}
           {thisModelInfo?.supportsAnimateLCM ||
           thisModelInfo?.supportsAnimateDiff ||
@@ -1023,7 +1040,12 @@ export default function Home() {
           >
             {model.model !=
             "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>Prompt</p>
+              <div className="tooltip">
+                <p>Prompt</p>
+                <span className="tooltiptext">
+                  Be descriptive! Try to describe the scene, weather, lighting, colours, etc.
+                </span>
+              </div>
             ) : null}
             {model.model !=
             "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
@@ -1056,9 +1078,12 @@ export default function Home() {
             {/* Negative prompt input */}
             {model.model !=
             "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>
-                Negative prompt
-              </p>
+              <div className="tooltip">
+                <p>Negative prompt</p>
+                <span className="tooltiptext">
+                  Don't over-do it! Especially when using a checkpoint or LoRa.
+                </span>
+              </div>
             ) : null}
             {model.model !=
             "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
@@ -1090,7 +1115,10 @@ export default function Home() {
             ) : null}
             {/* AnimateDiff-Lightning supports camera direction */}
             {model.enableAnimateDiffLightning ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>Motion</p>
+              <div className="tooltip">
+                <p>Motion</p>
+                <span className="tooltiptext">Control camera movement.</span>
+              </div>
             ) : null}
             {model.enableAnimateDiffLightning ? (
               <div className="grid">
@@ -1123,9 +1151,12 @@ export default function Home() {
             {model.model != "timbrooks/instruct-pix2pix" &&
             model.model !=
               "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>
-                Prompt style template
-              </p>
+              <div className="tooltip">
+                <p>Prompt style template</p>
+                <span className="tooltiptext">
+                  Applies a template to your prompt to recreate a specific style.
+                </span>
+              </div>
             ) : null}
             {/* Style templates! */}
             {model.model != "timbrooks/instruct-pix2pix" &&
@@ -1168,7 +1199,12 @@ export default function Home() {
             !model.enableAnimateLCM &&
             !model.enableAnimateDiff &&
             !model.enableAnimateDiffLightning ? (
-              <p style={{ color: "#ffffff", alignSelf: "center" }}>LoRas</p>
+              <div className="tooltip">
+                <p>LoRas</p>
+                <span className="tooltiptext">
+                  Enhance or restyle the output completely.
+                </span>
+              </div>
             ) : null}
             {thisModelInfo.loRas.length &&
             model.baseModel == "" &&
