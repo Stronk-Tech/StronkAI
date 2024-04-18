@@ -357,10 +357,6 @@ export default function Home() {
     setPipeline(newVal);
   }
 
-  function handlePromptChange(newVal) {
-    setPrompt(newVal);
-  }
-
   // Replaces "template" with {words} in it with their corresponding value in data (obj)
   function replaceMe(template, data) {
     const pattern = /{\s*(\w+?)\s*}/g;
@@ -876,6 +872,9 @@ export default function Home() {
                   if (!thisModelInfo.supportsAnimateDiff) {
                     return;
                   }
+                  model.enableLCM = false;
+                  model.enableTurbo = false;
+                  model.enableLightning = false;
                   model.enableAnimateLCM = false;
                   model.enableAnimateDiff = true;
                   model.enableAnimateDiffLightning = false;
@@ -919,6 +918,9 @@ export default function Home() {
                   if (!thisModelInfo.supportsAnimateDiffLightning) {
                     return;
                   }
+                  model.enableLCM = false;
+                  model.enableTurbo = false;
+                  model.enableLightning = false;
                   model.enableAnimateLCM = false;
                   model.enableAnimateDiff = false;
                   model.enableAnimateDiffLightning = true;
@@ -962,6 +964,9 @@ export default function Home() {
                   if (!thisModelInfo.supportsAnimateLCM) {
                     return;
                   }
+                  model.enableLCM = false;
+                  model.enableTurbo = false;
+                  model.enableLightning = false;
                   model.enableAnimateLCM = true;
                   model.enableAnimateDiff = false;
                   model.enableAnimateDiffLightning = false;
@@ -987,6 +992,10 @@ export default function Home() {
           >
             {model.model !=
             "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
+              <p style={{ color: "#ffffff", alignSelf: "center" }}>Prompt</p>
+            ) : null}
+            {model.model !=
+            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
               <div
                 style={{
                   width: "100%",
@@ -1008,7 +1017,42 @@ export default function Home() {
                     marginRight: "0.2em",
                     minHeight: "200px",
                   }}
-                  onChange={(e) => handlePromptChange(e.target.value)}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+            ) : null}
+            {/* Negative prompt input */}
+            {model.model !=
+            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
+              <p style={{ color: "#ffffff", alignSelf: "center" }}>
+                Negative prompt
+              </p>
+            ) : null}
+            {model.model !=
+            "stabilityai/stable-video-diffusion-img2vid-xt-1-1" ? (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  flex: 1,
+                  justifyContent: "stretch",
+                  alignItems: "stretch",
+                  maxHeight: "400px",
+                }}
+              >
+                <textarea
+                  value={negative_prompt}
+                  placeholder={"Negative Prompt"}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    marginLeft: "0.2em",
+                    marginRight: "0.2em",
+                    minHeight: "100px",
+                  }}
+                  onChange={(e) => setNegativePrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />{" "}
               </div>
