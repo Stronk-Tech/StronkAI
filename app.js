@@ -267,7 +267,7 @@ const mint = (workerIdx, job) => {
     const formData = {
       prompt: job.prompt,
       model_id: job.model_id,
-      base_model_id: job.model_checkpoint_id,
+      model_checkpoint_id: job.model_checkpoint_id,
       negative_prompt: job.negative_prompt,
       width: job.width,
       height: job.height,
@@ -316,7 +316,7 @@ const mint = (workerIdx, job) => {
     data = JSON.stringify({
       prompt: job.prompt,
       model_id: job.model_id,
-      base_model_id: job.model_checkpoint_id,
+      model_checkpoint_id: job.model_checkpoint_id,
       negative_prompt: job.negative_prompt,
       width: job.width,
       height: job.height,
