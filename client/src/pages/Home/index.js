@@ -593,7 +593,7 @@ export default function Home() {
           <div
             style={{
               display: "flex",
-              width: "100%",
+              maxWidth: "100%",
               justifyContent: "space-evenly",
               height: "100px",
               marginBottom: "2em",
@@ -665,18 +665,18 @@ export default function Home() {
                   disabled
                     ? {
                         backgroundColor: "grey",
-                        flex: 1,
+                        flex: 3,
                         height: "100%",
                         padding: 0,
                         height: "100px",
-                        width: "200px",
+                        maxWidth: "200px",
                       }
                     : {
                         cursor: "pointer",
-                        flex: 1,
+                        flex: 3,
                         padding: 0,
                         height: "100px",
-                        width: "200px",
+                        maxWidth: "200px",
                         border: "3px solid rgba(56, 109, 164, 0.82)",
                       }
                 }

@@ -267,7 +267,7 @@ const mint = (workerIdx, job) => {
     const formData = {
       prompt: job.prompt,
       model_id: job.model_id,
-      base_model_id: job.base_model_id,
+      base_model_id: job.model_checkpoint_id,
       negative_prompt: job.negative_prompt,
       width: job.width,
       height: job.height,
@@ -316,7 +316,7 @@ const mint = (workerIdx, job) => {
     data = JSON.stringify({
       prompt: job.prompt,
       model_id: job.model_id,
-      base_model_id: job.base_model_id,
+      base_model_id: job.model_checkpoint_id,
       negative_prompt: job.negative_prompt,
       width: job.width,
       height: job.height,
@@ -388,7 +388,7 @@ app.post("/tokenize", (req, res) => {
   const lora = req.body.lora || "";
   const image = req.body.image;
   let model_id = req.body.model;
-  let base_model_id = req.body.baseModel || "";
+  let model_checkpoint_id = req.body.baseModel || "";
   let pipeline = req.body.pipeline;
   let speedup_module = req.body.speedup_module || "";
   let animate_module = req.body.animate_module || "";
@@ -436,42 +436,42 @@ app.post("/tokenize", (req, res) => {
   if (model_id == "stabilityai/stable-diffusion-xl-base-1.0") {
     if (speedup_module == "Turbo") {
       speedup_module = "";
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
-        base_model_id = "";
+      if (model_checkpoint_id == "Lykon/dreamshaper-xl-1-0") {
+        model_checkpoint_id = "";
         model_id = "Lykon/dreamshaper-xl-v2-turbo";
       } else {
-        base_model_id = "";
+        model_checkpoint_id = "";
         model_id = "stabilityai/sdxl-turbo";
       }
     } else if (speedup_module == "Lightning") {
       speedup_module = "";
-      if (base_model_id == "Lykon/dreamshaper-xl-1-0") {
-        base_model_id = "";
+      if (model_checkpoint_id == "Lykon/dreamshaper-xl-1-0") {
+        model_checkpoint_id = "";
         model_id = "Lykon/dreamshaper-xl-lightning";
-      } else if (base_model_id == "SG161222/RealVisXL_V4.0") {
-        base_model_id = "";
+      } else if (model_checkpoint_id == "SG161222/RealVisXL_V4.0") {
+        model_checkpoint_id = "";
         model_id = "SG161222/RealVisXL_V4.0_Lightning";
       } else {
-        base_model_id = "";
+        model_checkpoint_id = "";
         model_id = "ByteDance/SDXL-Lightning";
       }
     } else if (speedup_module == "LCM") {
-      if (base_model_id == "") {
-        base_model_id == "stabilityai/stable-diffusion-xl-base-1.0";
+      if (model_checkpoint_id == "") {
+        model_checkpoint_id == "stabilityai/stable-diffusion-xl-base-1.0";
         model_id = "latent-consistency/lcm-lora-sdxl";
       } else {
         // Thus all SDXL models load as their own dedicated model
-        model_id = base_model_id;
+        model_id = model_checkpoint_id;
       }
     } else {
       // Thus all SDXL models load as their own dedicated model
-      if (base_model_id != "") {
-        model_id = base_model_id;
+      if (model_checkpoint_id != "") {
+        model_id = model_checkpoint_id;
       }
     }
   } else if (animate_module != "") {
-    if (base_model_id == "") {
-      base_model_id == "runwayml/stable-diffusion-v1-5";
+    if (model_checkpoint_id == "") {
+      model_checkpoint_id == "runwayml/stable-diffusion-v1-5";
     }
     if (animate_module == "LCM") {
       model_id = "wangfuyun/AnimateLCM";
@@ -483,12 +483,12 @@ app.post("/tokenize", (req, res) => {
   } else if (model_id == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
     if (speedup_module == "LCM") {
       model_id = "wangfuyun/AnimateLCM-SVD-xt";
-      base_model_id = "";
+      model_checkpoint_id = "";
     }
   } else {
     if (speedup_module == "LCM") {
-      if (base_model_id == "") {
-        base_model_id == "runwayml/stable-diffusion-v1-5";
+      if (model_checkpoint_id == "") {
+        model_checkpoint_id == "runwayml/stable-diffusion-v1-5";
       }
       model_id = "latent-consistency/lcm-lora-sdv1-5";
     }
@@ -506,7 +506,7 @@ app.post("/tokenize", (req, res) => {
       motion: motion,
       lora: lora,
       model_id: model_id,
-      base_model_id: base_model_id,
+      model_checkpoint_id: model_checkpoint_id,
       source: imagePath + "/" + image,
       pipeline: pipeline,
       speedup_module: speedup_module,
@@ -536,7 +536,7 @@ app.post("/tokenize", (req, res) => {
       motion: motion,
       lora: lora,
       model_id: model_id,
-      base_model_id: base_model_id,
+      model_checkpoint_id: model_checkpoint_id,
       source: videoPath + "/" + image,
       pipeline: pipeline,
       speedup_module: speedup_module,
@@ -561,7 +561,7 @@ app.post("/tokenize", (req, res) => {
       motion: motion,
       lora: lora,
       model_id: model_id,
-      base_model_id: base_model_id,
+      model_checkpoint_id: model_checkpoint_id,
       source: null,
       pipeline: pipeline,
       speedup_module: speedup_module,

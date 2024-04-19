@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import useWebSocket from "react-use-websocket";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 export default function useApi(HTTP_URL, WS_URL) {
   // Max amount of active jobs. Given by backend API
@@ -24,10 +24,17 @@ export default function useApi(HTTP_URL, WS_URL) {
       shouldReconnect: () => true,
     }
   );
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
 
   // Run when the connection state (readyState) changes
   useEffect(() => {
-    console.log("Connection state changed");
+    console.log("WebSocket connection changed to " + connectionStatus);
   }, [readyState]);
 
   // Run when a new WebSocket message is received (lastJsonMessage)
