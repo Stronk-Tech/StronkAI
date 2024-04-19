@@ -249,9 +249,6 @@ const mint = (workerIdx, job) => {
   }
   workers[workerIdx].busy = true;
   workers[workerIdx].pipeline = job.pipeline;
-  if (job.pipeline == "text-to-image" && job.animate_module != "") {
-    job.pipeline = "text-to-video";
-  }
   workers[workerIdx].model_id = job.model_id;
   workers[workerIdx].timestamp = Date.now();
   wsServer.broadcast(
@@ -470,6 +467,7 @@ app.post("/tokenize", (req, res) => {
       }
     }
   } else if (animate_module != "") {
+    pipeline = "text-to-video";
     if (model_checkpoint_id == "") {
       model_checkpoint_id == "runwayml/stable-diffusion-v1-5";
     }
