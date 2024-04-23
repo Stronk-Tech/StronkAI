@@ -562,6 +562,7 @@ export default function Home() {
           {/* Negative prompt input */}
           <NegativePrompt
             model={model}
+            template={template}
             setNegativePrompt={setNegativePrompt}
             negative_prompt={negative_prompt}
             handleKeyDown={handleKeyDown}

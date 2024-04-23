@@ -8,8 +8,9 @@ export default function NegativePrompt({
   setNegativePrompt,
   negative_prompt,
   handleKeyDown,
+  template
 }) {
-  if (model.model == "stabilityai/stable-video-diffusion-img2vid-xt-1-1") {
+  if (model.model == "stabilityai/stable-video-diffusion-img2vid-xt-1-1" || (template && template != "{prompt}")) {
     return;
   }
   return (
